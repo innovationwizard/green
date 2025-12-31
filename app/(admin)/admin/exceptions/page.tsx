@@ -51,10 +51,9 @@ export default function ExceptionsPage() {
   }
 
   async function handleResolveDuplicate(eventId: string) {
-    const updateData: EventsUpdate = { duplicate_flag: false }
     const { error } = await supabase
       .from('events')
-      .update(updateData)
+      .update({ duplicate_flag: false } as EventsUpdate)
       .eq('id', eventId)
 
     if (!error) {
