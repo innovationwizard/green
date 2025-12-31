@@ -1,11 +1,12 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import InstallerNav from '@/components/installer/nav'
 import { Database } from '@/types/database.types'
+import { Logo } from '@/components/shared/logo'
+import Link from 'next/link'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 
-export default async function InstallerLayout({
+export default async function DevLayout({
   children,
 }: {
   children: React.ReactNode
@@ -30,16 +31,26 @@ export default async function InstallerLayout({
     redirect('/auth/reset-password')
   }
   
-  // Allow installer and developer (superuser) roles
-  // Developer has full access to all routes including installer routes
-  if (userDataTyped?.role !== 'installer' && userDataTyped?.role !== 'developer') {
+  // DEV layout is ONLY for developer role (superuser)
+  // This is separate from admin (accounting/paperwork personnel)
+  if (userDataTyped?.role !== 'developer') {
     redirect('/')
   }
   
   return (
     <div className="min-h-screen bg-gray-50">
-      <InstallerNav userName={userDataTyped?.full_name || user.email || ''} />
-      <main className="pb-20">{children}</main>
+      <nav className="bg-white border-b sticky top-0 z-10">
+        <div className="px-4 py-3">
+          <div className="flex justify-between items-center mb-2">
+            <Logo showText={false} />
+            <div className="text-sm text-muted-foreground">{userDataTyped?.full_name || user.email}</div>
+          </div>
+          <div className="flex gap-4 text-sm">
+            <Link href="/dev" className="hover:text-primary font-medium">Developer Dashboard</Link>
+          </div>
+        </div>
+      </nav>
+      <main className="p-4">{children}</main>
     </div>
   )
 }

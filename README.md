@@ -118,10 +118,10 @@ green/
 
 ## Roles y Permisos
 
-- **Installer**: Puede crear eventos offline, sincronizar, anular sus propios eventos hasta el sábado 23:59
-- **Admin**: Acceso completo a CRUD, dashboards, eliminación de eventos, configuración
-- **Manager**: Solo lectura de dashboards y visibilidad
-- **Developer**: Superusuario con bypass para soporte
+- **Installer**: Puede crear eventos offline, sincronizar, anular sus propios eventos hasta el sábado 23:59. Ruta: `/installer/*`
+- **Admin**: Personal administrativo/contabilidad/papeleo. Acceso completo a CRUD, dashboards, eliminación de eventos, configuración. Ruta: `/admin/*`
+- **Manager**: CEO/Decision maker. Solo lectura de dashboards y visibilidad. Ruta: `/manager/*`
+- **Developer**: Superusuario técnico (soporte/debugging). Acceso completo a TODAS las rutas: `/dev/*`, `/admin/*`, `/manager/*`, `/installer/*`. **IMPORTANTE:** Developer es completamente separado de Admin (no está anidado bajo admin).
 
 ## Funcionalidades Clave
 

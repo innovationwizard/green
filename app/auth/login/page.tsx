@@ -41,7 +41,18 @@ export default function LoginPage() {
           .single()
 
         const userDataTyped = userData as Pick<UserRow, 'role' | 'must_change_password'> | null
-        const role = userDataTyped?.role || 'installer'
+        
+        // Industry best practice: DEV/superuser should ALWAYS land at admin interface
+        // Never default to installer - if role is missing, it's an error condition
+        const role = userDataTyped?.role
+        
+        if (!role) {
+          // Role lookup failed - this is an error condition
+          setError('Error: No se pudo determinar el rol del usuario. Contacte al administrador.')
+          setLoading(false)
+          return
+        }
+        
         const mustChangePassword = userDataTyped?.must_change_password ?? true
 
         // If user must change password, redirect to reset page
@@ -52,12 +63,20 @@ export default function LoginPage() {
         }
 
         // Redirect based on role
-        if (role === 'admin' || role === 'developer') {
+        // DEV is a superuser with dedicated top-level route (separate from admin/accounting)
+        if (role === 'developer') {
+          router.push('/dev')
+        } else if (role === 'admin') {
           router.push('/admin')
         } else if (role === 'manager') {
           router.push('/manager')
-        } else {
+        } else if (role === 'installer') {
           router.push('/installer')
+        } else {
+          // Unknown role - show error
+          setError(`Error: Rol desconocido: ${role}. Contacte al administrador.`)
+          setLoading(false)
+          return
         }
         router.refresh()
       }

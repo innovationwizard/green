@@ -26,15 +26,30 @@ export default async function HomePage() {
     redirect('/auth/reset-password')
   }
   
-  const role = userDataTyped?.role || 'installer'
+  // Industry best practice: DEV/superuser should ALWAYS land at admin interface
+  // Never default to installer - if role is missing, it's an error condition
+  const role = userDataTyped?.role
+  
+  if (!role) {
+    // Role lookup failed - this is an error condition, not a default to installer
+    console.error('User role not found for user:', user.id)
+    redirect('/auth/login')
+  }
   
   // Redirect based on role
-  if (role === 'admin' || role === 'developer') {
+  // DEV is a superuser with dedicated top-level route (separate from admin/accounting)
+  if (role === 'developer') {
+    redirect('/dev')
+  } else if (role === 'admin') {
     redirect('/admin')
   } else if (role === 'manager') {
     redirect('/manager')
-  } else {
+  } else if (role === 'installer') {
     redirect('/installer')
+  } else {
+    // Unknown role - redirect to login
+    console.error('Unknown role:', role)
+    redirect('/auth/login')
   }
 }
 

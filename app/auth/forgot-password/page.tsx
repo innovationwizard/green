@@ -36,7 +36,8 @@ export default function ForgotPasswordPage() {
         throw new Error(
           'PRODUCTION ERROR: Site URL cannot be localhost. ' +
           'Please set NEXT_PUBLIC_SITE_URL environment variable to your production domain (e.g., https://yourdomain.com). ' +
-          'Current URL: ' + siteUrl
+          'Current URL: ' + siteUrl + '. ' +
+          'Also ensure your Supabase Dashboard → Authentication → Settings → Site URL is set to your production domain.'
         )
       }
       
@@ -45,7 +46,13 @@ export default function ForgotPasswordPage() {
         siteUrl = siteUrl.replace(/^http:\/\//, 'https://')
       }
       
+      // Remove trailing slash if present
+      siteUrl = siteUrl.replace(/\/$/, '')
+      
       const redirectTo = `${siteUrl}/auth/reset-password-confirm`
+      
+      // Log for debugging (remove in production if needed)
+      console.log('[Password Recovery] Using redirect URL:', redirectTo)
 
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo,

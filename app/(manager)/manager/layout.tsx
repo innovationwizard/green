@@ -31,7 +31,9 @@ export default async function ManagerLayout({
     redirect('/auth/reset-password')
   }
   
-  if (userDataTyped?.role !== 'manager') {
+  // Allow manager and developer (superuser) roles
+  // Developer has full access to all routes including manager routes
+  if (userDataTyped?.role !== 'manager' && userDataTyped?.role !== 'developer') {
     redirect('/')
   }
   
