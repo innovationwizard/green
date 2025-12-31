@@ -78,8 +78,7 @@ CREATE TABLE public.items (
   active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_by UUID REFERENCES auth.users(id),
-  UNIQUE(sku) WHERE sku IS NOT NULL
+  created_by UUID REFERENCES auth.users(id)
 );
 
 -- Labor rates
@@ -91,9 +90,7 @@ CREATE TABLE public.labor_rates (
   effective_from DATE NOT NULL DEFAULT CURRENT_DATE,
   effective_to DATE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_by UUID REFERENCES auth.users(id),
-  UNIQUE(user_id, effective_from) WHERE user_id IS NOT NULL,
-  UNIQUE(role_name, effective_from) WHERE role_name IS NOT NULL
+  created_by UUID REFERENCES auth.users(id)
 );
 
 -- Projects
@@ -316,6 +313,11 @@ CREATE INDEX idx_project_costs_daily_project_date ON public.project_costs_daily(
 CREATE INDEX idx_project_revenue_daily_project_date ON public.project_revenue_daily(project_id, date);
 CREATE INDEX idx_ar_aging_snapshot_date ON public.ar_aging_snapshot(snapshot_date);
 CREATE INDEX idx_ap_aging_snapshot_date ON public.ap_aging_snapshot(snapshot_date);
+
+-- Partial unique indexes (for nullable columns)
+CREATE UNIQUE INDEX idx_items_sku_unique ON public.items(sku) WHERE sku IS NOT NULL;
+CREATE UNIQUE INDEX idx_labor_rates_user_effective_unique ON public.labor_rates(user_id, effective_from) WHERE user_id IS NOT NULL;
+CREATE UNIQUE INDEX idx_labor_rates_role_effective_unique ON public.labor_rates(role_name, effective_from) WHERE role_name IS NOT NULL;
 
 -- Row Level Security (RLS) Policies
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
