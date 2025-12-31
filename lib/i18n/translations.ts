@@ -1,4 +1,4 @@
-// Spanish translations for GREEN APP
+// Spanish translations for GREENTELLIGENCE
 export const translations = {
   common: {
     save: 'Guardar',

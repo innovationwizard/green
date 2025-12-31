@@ -1,4 +1,4 @@
-GREEN APP - Solar EPC Operations Ledger, Analytics, and AI Insights
+GREENTELLIGENCE - Optimización y Automatización de Procesos con Inteligencia Artificial
 
 Goal
 

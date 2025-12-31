@@ -1,4 +1,4 @@
-# Roles y Permisos - GREEN APP
+# Roles y Permisos - GREENTELLIGENCE
 
 ## Definición de Roles
 

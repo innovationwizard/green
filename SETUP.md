@@ -131,7 +131,7 @@ Los archivos `public/icon-192.png` y `public/icon-512.png` son placeholders.
 Para producción, crear iconos reales:
 - 192x192px para `icon-192.png`
 - 512x512px para `icon-512.png`
-- Usar el logo de GREEN APP
+- Usar el logo de GREENTELLIGENCE
 - Formato PNG con fondo transparente o sólido
 
 Puedes usar herramientas como:

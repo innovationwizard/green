@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'GREEN APP - Solar EPC Operations',
-  description: 'Solar EPC Operations Ledger, Analytics, and AI Insights',
+  title: 'GREENTELLIGENCE',
+  description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
   manifest: '/manifest.json',
   themeColor: '#16a34a',
   icons: {
@@ -14,22 +14,22 @@ export const metadata: Metadata = {
     apple: '/icon.svg',
   },
   openGraph: {
-    title: 'GREEN APP - Solar EPC Operations',
-    description: 'Solar EPC Operations Ledger, Analytics, and AI Insights',
+    title: 'GREENTELLIGENCE',
+    description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
     type: 'website',
     images: [
       {
         url: '/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'GREEN APP',
+        alt: 'GREENTELLIGENCE',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'GREEN APP - Solar EPC Operations',
-    description: 'Solar EPC Operations Ledger, Analytics, and AI Insights',
+    title: 'GREENTELLIGENCE',
+    description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
     images: ['/opengraph-image'],
   },
   viewport: {
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'GREEN APP',
+    title: 'GREENTELLIGENCE',
   },
 }
 

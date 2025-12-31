@@ -1,4 +1,4 @@
-# GREEN APP - Build Plan & Implementation Order
+# GREENTELLIGENCE - Build Plan & Implementation Order
 
 ## Optimal Build Order (Dependencies First)
 

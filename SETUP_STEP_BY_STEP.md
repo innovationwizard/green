@@ -1,4 +1,4 @@
-# Setup Paso a Paso - GREEN APP
+# Setup Paso a Paso - GREENTELLIGENCE
 
 ## ✅ Completado
 - [x] Migraciones ejecutadas

@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'GREEN APP - Solar EPC Operations'
+export const alt = 'GREENTELLIGENCE'
 export const size = {
   width: 1200,
   height: 630,
@@ -56,15 +56,18 @@ export default async function Image() {
             marginBottom: '20px',
           }}
         >
-          GREEN APP
+          GREENTELLIGENCE
         </div>
         <div
           style={{
-            fontSize: '32px',
+            fontSize: '28px',
             color: 'rgba(255, 255, 255, 0.9)',
+            textAlign: 'center',
+            maxWidth: '1000px',
+            padding: '0 40px',
           }}
         >
-          Solar EPC Operations
+          Optimización y Automatización de Procesos con Inteligencia Artificial
         </div>
       </div>
     ),

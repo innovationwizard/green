@@ -1,4 +1,4 @@
-# Quick Start - GREEN APP Deployment
+# Quick Start - GREENTELLIGENCE Deployment
 
 ## 🚀 Pasos Rápidos para Publicar
 

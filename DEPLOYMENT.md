@@ -1,4 +1,4 @@
-# Guía de Despliegue - GREEN APP
+# Guía de Despliegue - GREENTELLIGENCE
 
 ## Paso 1: Configurar Supabase
 
@@ -255,7 +255,7 @@ Los iconos son necesarios para que la PWA funcione correctamente:
 1. **Crear iconos:**
    - `icon-192.png` (192x192px)
    - `icon-512.png` (512x512px)
-   - Usar el logo de GREEN APP
+   - Usar el logo de GREENTELLIGENCE
 
 2. **Herramientas recomendadas:**
    - [PWA Asset Generator](https://github.com/onderceylan/pwa-asset-generator)

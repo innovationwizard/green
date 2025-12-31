@@ -1,7 +1,7 @@
 {
-  "name": "GREEN APP - Solar EPC Operations",
-  "short_name": "GREEN APP",
-  "description": "Solar EPC Operations Ledger, Analytics, and AI Insights",
+  "name": "GREENTELLIGENCE",
+  "short_name": "GREENTELLIGENCE",
+  "description": "Optimización y Automatización de Procesos con Inteligencia Artificial",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

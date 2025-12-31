@@ -1,4 +1,6 @@
-# GREEN APP - Solar EPC Operations Ledger
+# GREENTELLIGENCE
+
+Optimización y Automatización de Procesos con Inteligencia Artificial
 
 Sistema completo de gestión operativa para empresas de energía solar EPC (Engineering, Procurement, Construction) con capacidades offline-first, análisis en tiempo real y insights de IA.
 

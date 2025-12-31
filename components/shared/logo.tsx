@@ -16,7 +16,7 @@ export function Logo({ className, size = 24, showText = true }: LogoProps) {
         strokeWidth={2}
       />
       {showText && (
-        <span className="font-semibold text-lg">GREEN APP</span>
+        <span className="font-semibold text-lg">GREENTELLIGENCE</span>
       )}
     </div>
   )
