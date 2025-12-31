@@ -16,7 +16,7 @@ export async function addToOutbox(event: PendingEvent): Promise<void> {
   }
   
   // Store event without photos (photos stored separately)
-  const { photos, ...eventWithoutPhotos } = event
+  const { photos: _photos, ...eventWithoutPhotos } = event
   await tx.store.put({
     ...eventWithoutPhotos,
     synced: false,

@@ -25,7 +25,7 @@ export async function syncOutbox(userId: string): Promise<SyncResult> {
   for (const event of events) {
     try {
       // Upload photos first if they exist
-      let photoUrls: string[] = []
+      const photoUrls: string[] = []
       if (event.photos && event.photos.length > 0) {
         for (const photo of event.photos) {
           const photoPath = `events/${event.client_uuid}/${Date.now()}_${photo.name}`

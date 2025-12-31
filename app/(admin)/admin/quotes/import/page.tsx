@@ -14,6 +14,14 @@ export default function ImportQuotePage() {
   const [projectId, setProjectId] = useState<string>('')
   const [projects, setProjects] = useState<any[]>([])
   const [file, setFile] = useState<File | null>(null)
+  
+  // Keep file state for file input
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0]
+    if (selectedFile) {
+      setFile(selectedFile)
+    }
+  }
   const [parsedQuote, setParsedQuote] = useState<ParsedQuote | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

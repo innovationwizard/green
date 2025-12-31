@@ -1,5 +1,4 @@
 import { getDB } from './db'
-import { Database } from '@/types/database.types'
 
 export interface CachedItem {
   id: string

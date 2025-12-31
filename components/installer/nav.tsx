@@ -3,8 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Home, Plus, Clock, Wallet, Sync, LogOut } from 'lucide-react'
+import { Home, Plus, Clock, Wallet, RefreshCw, LogOut } from 'lucide-react'
 
 interface InstallerNavProps {
   userName: string
@@ -24,7 +23,7 @@ export default function InstallerNav({ userName }: InstallerNavProps) {
     { href: '/installer/eventos/nuevo', label: 'Nuevo Evento', icon: Plus },
     { href: '/installer/temporizador', label: 'Temporizador', icon: Clock },
     { href: '/installer/caja', label: 'Mi Caja', icon: Wallet },
-    { href: '/installer/sincronizar', label: 'Sincronizar', icon: Sync },
+    { href: '/installer/sincronizar', label: 'Sincronizar', icon: RefreshCw },
   ]
 
   return (

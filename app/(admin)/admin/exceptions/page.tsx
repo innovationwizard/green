@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { AlertTriangle, CheckCircle } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 
 export default function ExceptionsPage() {
   const [duplicates, setDuplicates] = useState<any[]>([])

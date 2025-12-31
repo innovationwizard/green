@@ -1,6 +1,5 @@
 import Papa from 'papaparse'
 import * as XLSX from 'xlsx'
-import { Database } from '@/types/database.types'
 
 export interface QuoteLineItem {
   quote_product_name: string
@@ -141,7 +140,7 @@ function parseQuoteData(data: any[]): ParsedQuote {
   }
 }
 
-export async function extractPDFQuote(file: File): Promise<ParsedQuote> {
+export async function extractPDFQuote(_file: File): Promise<ParsedQuote> {
   // PDF extraction is a placeholder - requires pdf-parse or similar
   // For now, return a basic structure
   // In production, this would use pdf-parse with coordinate-based extraction

@@ -8,7 +8,7 @@ import { syncOutbox } from '@/lib/sync/sync-service'
 import { getSyncStatus } from '@/lib/indexeddb/outbox'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { Sync, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
+import { RefreshCw, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 
 export default function SincronizarPage() {
   const [status, setStatus] = useState<{
@@ -105,12 +105,12 @@ export default function SincronizarPage() {
           >
             {syncing ? (
               <>
-                <Sync className="w-4 h-4 mr-2 animate-spin" />
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                 Sincronizando...
               </>
             ) : (
               <>
-                <Sync className="w-4 h-4 mr-2" />
+                <RefreshCw className="w-4 h-4 mr-2" />
                 Sincronizar Ahora
               </>
             )}

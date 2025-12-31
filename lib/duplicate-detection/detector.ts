@@ -115,7 +115,7 @@ export async function flagDuplicateEvents(): Promise<void> {
   }
 
   // Check each group for duplicates
-  for (const [key, events] of groups) {
+  for (const [, events] of groups) {
     if (events.length < 2) continue
 
     // For material events, compare item lines

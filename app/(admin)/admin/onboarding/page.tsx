@@ -2,17 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { CheckCircle, Circle } from 'lucide-react'
 
 type Step = 'admin' | 'installers' | 'catalog' | 'rates' | 'project' | 'quote'
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const supabase = createClient()
   const [currentStep, setCurrentStep] = useState<Step>('admin')
   const [completedSteps, setCompletedSteps] = useState<Set<Step>>(new Set())
 
@@ -40,7 +37,7 @@ export default function OnboardingPage() {
       <h1 className="text-3xl font-bold">Configuración Inicial</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-6 gap-2 mb-6">
-        {steps.map((step, index) => {
+        {steps.map((step) => {
           const isCompleted = completedSteps.has(step.id)
           const isCurrent = currentStep === step.id
           const Icon = isCompleted ? CheckCircle : Circle

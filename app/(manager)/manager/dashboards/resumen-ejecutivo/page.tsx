@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { subDays, format } from 'date-fns'
-import { es } from 'date-fns/locale'
 
 export default function ManagerResumenEjecutivoPage() {
   const [dateRange, setDateRange] = useState({

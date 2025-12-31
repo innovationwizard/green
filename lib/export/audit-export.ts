@@ -1,7 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
 import { exportData, ExportData } from './export-service'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
 
 export async function exportAuditLog(
   startDate: Date,

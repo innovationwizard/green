@@ -50,7 +50,7 @@ export async function createEvent<T extends EventType>(
 export async function reverseEvent(
   originalEventId: string,
   reason: string,
-  userId: string
+  _userId: string
 ): Promise<string> {
   // This will be called from the server-side API route
   // For now, we'll create the reversing event in the outbox

@@ -14,7 +14,7 @@ export default function TemporizadorPage() {
   const [elapsed, setElapsed] = useState(0)
   const [manualHours, setManualHours] = useState('')
   const [manualMinutes, setManualMinutes] = useState('')
-  const [projectId, setProjectId] = useState<string | null>(null)
+  const [projectId] = useState<string | null>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
