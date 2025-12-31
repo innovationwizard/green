@@ -8,6 +8,9 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { AlertTriangle } from 'lucide-react'
 import { ExceptionEvent, OmissionWarning } from '@/types/dashboard.types'
+import { Database } from '@/types/database.types'
+
+type EventsUpdate = Database['public']['Tables']['events']['Update']
 
 export default function ExceptionsPage() {
   const [duplicates, setDuplicates] = useState<ExceptionEvent[]>([])
@@ -48,9 +51,10 @@ export default function ExceptionsPage() {
   }
 
   async function handleResolveDuplicate(eventId: string) {
+    const updateData: EventsUpdate = { duplicate_flag: false }
     const { error } = await supabase
       .from('events')
-      .update({ duplicate_flag: false })
+      .update(updateData)
       .eq('id', eventId)
 
     if (!error) {
