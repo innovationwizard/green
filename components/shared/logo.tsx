@@ -9,7 +9,7 @@ interface LogoProps {
 
 export function Logo({ className, size = 24, showText = true }: LogoProps) {
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex items-center gap-2', showText && 'flex-col', className)}>
       <FileChartColumnIncreasing 
         size={size} 
         className="text-green-600"
