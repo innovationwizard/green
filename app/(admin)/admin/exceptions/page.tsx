@@ -48,11 +48,11 @@ export default function ExceptionsPage() {
   }
 
   async function handleResolveDuplicate(eventId: string) {
-    // TypeScript has issues inferring the update type, so we use a type assertion
+    // TypeScript has issues inferring the update type
+    // @ts-expect-error - Supabase type inference fails for update operations
     const { error } = await supabase
       .from('events')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .update({ duplicate_flag: false } as any)
+      .update({ duplicate_flag: false })
       .eq('id', eventId)
 
     if (!error) {
