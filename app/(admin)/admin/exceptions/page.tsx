@@ -51,9 +51,11 @@ export default function ExceptionsPage() {
   }
 
   async function handleResolveDuplicate(eventId: string) {
+    // TypeScript has issues inferring the update type, so we use a type assertion
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await supabase
       .from('events')
-      .update({ duplicate_flag: false } as EventsUpdate)
+      .update({ duplicate_flag: false } as any)
       .eq('id', eventId)
 
     if (!error) {
