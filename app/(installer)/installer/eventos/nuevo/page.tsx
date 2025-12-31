@@ -22,6 +22,7 @@ export default function NuevoEventoPage() {
 
   useEffect(() => {
     loadProjects()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function loadProjects() {

@@ -16,6 +16,7 @@ export default function ResumenEjecutivoPage() {
 
   useEffect(() => {
     loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange])
 
   async function loadData() {

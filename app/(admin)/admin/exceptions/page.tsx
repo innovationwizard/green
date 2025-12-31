@@ -16,6 +16,7 @@ export default function ExceptionsPage() {
 
   useEffect(() => {
     loadExceptions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function loadExceptions() {

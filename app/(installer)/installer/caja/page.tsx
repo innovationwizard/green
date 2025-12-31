@@ -15,6 +15,7 @@ export default function MiCajaPage() {
 
   useEffect(() => {
     loadCashBox()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function loadCashBox() {
