@@ -1,0 +1,60 @@
+Executive Summary
+
+Sergio (CEO) has separated the engagement into two distinct deliverables: a motivational workshop for the general staff and a high-level strategic implementation for the management team. His primary directive is operational efficiency without headcount growth ("Empower one person to do the work of ten"). He requires a "shock and awe" approach for the staff to drive adoption, while the management salespoints and views must focus strictly on financial ROI (cost/time savings) rather than technical features.
+
+Key Operational Pain Points Identified:
+
+Accounts Payable: Invoices arrive late and are difficult to match to specific projects/inverters, causing cost allocation issues.
+
+Sales: Field teams provide unreliable activity reports ("casaca"). Sergio wants to move from unverifiable claims to verified data.
+
+Finance: Processes are highly manual and reactive. The goal is to automate compliance and avoid audit risks.
+
+Next Steps & Action Items
+
+Deliverable A: Management Strategy Presentation
+
+Audience: Sergio, Luis & Julián (Operations), Flor (Finance), Isabel (Commercial), and the Assistant.
+
+Requirement: Quantifiable ROI. You must present a "Before vs. After" comparison showing specific time/money savings.
+
+Tone: "Cold numbers." If it costs X, it must save Y. No "nice to have" features.
+
+Deliverable B: Staff Workshop (2 Hours)
+
+Audience: "Green en pleno" (All staff).
+
+Format: In-person, likely a breakfast or lunch at a restaurant.
+
+Structure:
+
+Part 1: Intro & Demystification ("What exists?").
+
+Part 2: Hands-on implementation ("What can I use today?").
+
+High-ROI AI Opportunities (For Management Deck)
+Based on Sergio’s specific friction points, these are the 3 highest-value implementations to pitch:
+
+1. The "Truth" Engine for Sales (Voice-to-Data)
+
+Problem: Salespeople claiming they worked when they were at the sauna; manual reporting is friction-heavy.
+
+AI Solution: Equip sales reps with a voice-first agent. They dictate their visit summary immediately after leaving the client.
+
+ROI: 100% data capture accuracy + GPS verification stamp. Eliminates "I forgot to type it up" excuses.
+
+2. Automated Invoice Intelligence (AP Logic)
+
+Problem: "Cuentas por pagar" nightmare—unable to allocate material costs (inverters) to specific projects due to messy/late vendor invoices.
+
+AI Solution: An AI agent that ingests PDF invoices/photos, extracts line items, and cross-references them against open Project POs to suggest the correct cost code automatically.
+
+ROI: Reduces processing time from days to seconds; enables real-time project profitability tracking.
+
+3. The "Auditor Shield" (Finance)
+
+Problem: Flor is doing manual entry and fears audit discrepancies.
+
+AI Solution: Anomaly detection agent. It scans ledgers against receipts to flag inconsistencies before the external audit happens.
+
+ROI: Risk mitigation and zero overtime during tax season.
