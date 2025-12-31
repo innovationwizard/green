@@ -117,6 +117,15 @@ export default function LoginPage() {
             </Button>
           </form>
 
+          <div className="mt-4 text-center">
+            <a
+              href="/auth/forgot-password"
+              className="text-sm text-primary hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+
           <p className="text-xs text-gray-400 text-center mt-6">
             Powered by <span style={{ color: '#dc2626' }}>Artificial Intelligence Developments</span> © 2025
           </p>
