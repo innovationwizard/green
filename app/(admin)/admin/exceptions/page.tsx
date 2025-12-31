@@ -49,6 +49,7 @@ export default function ExceptionsPage() {
 
   async function handleResolveDuplicate(eventId: string) {
     // TypeScript has issues inferring the update type
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - Supabase type inference fails for update operations
     const { error } = await supabase
       .from('events')
