@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION compute_project_costs_daily(
 )
 RETURNS void AS $$
 DECLARE
-  current_date DATE;
+  loop_date DATE;
   event_record RECORD;
 BEGIN
   -- Clear existing data for the date range
@@ -13,8 +13,8 @@ BEGIN
   WHERE date >= start_date AND date <= end_date;
 
   -- Process each day in the range
-  current_date := start_date;
-  WHILE current_date <= end_date LOOP
+  loop_date := start_date;
+  WHILE loop_date <= end_date LOOP
     -- Aggregate costs by project for this day
     INSERT INTO public.project_costs_daily (
       project_id,
@@ -28,7 +28,7 @@ BEGIN
     )
     SELECT
       e.project_id,
-      current_date,
+      loop_date,
       COALESCE(SUM(
         CASE WHEN e.event_type IN ('MATERIAL_ADDED', 'CREDIT_PURCHASE_RECORDED')
         THEN (e.payload->>'items')::jsonb @> '[]'::jsonb
@@ -43,8 +43,8 @@ BEGIN
           SELECT rate_per_hour
           FROM public.labor_rates
           WHERE user_id = e.created_by
-            AND effective_from <= current_date
-            AND (effective_to IS NULL OR effective_to >= current_date)
+            AND effective_from <= loop_date
+            AND (effective_to IS NULL OR effective_to >= loop_date)
           ORDER BY effective_from DESC
           LIMIT 1
         )
@@ -69,8 +69,8 @@ BEGIN
           SELECT rate_per_hour
           FROM public.labor_rates
           WHERE user_id = e.created_by
-            AND effective_from <= current_date
-            AND (effective_to IS NULL OR effective_to >= current_date)
+            AND effective_from <= loop_date
+            AND (effective_to IS NULL OR effective_to >= loop_date)
           ORDER BY effective_from DESC
           LIMIT 1
         )
@@ -82,7 +82,7 @@ BEGIN
       ), 0) as total_cost,
       NOW() as computed_at
     FROM public.events e
-    WHERE DATE(e.created_at) = current_date
+    WHERE DATE(e.created_at) = loop_date
       AND e.hidden = false
       AND e.project_id IS NOT NULL
     GROUP BY e.project_id
@@ -94,7 +94,7 @@ BEGIN
       total_cost = EXCLUDED.total_cost,
       computed_at = NOW();
 
-    current_date := current_date + INTERVAL '1 day';
+    loop_date := loop_date + INTERVAL '1 day';
   END LOOP;
 END;
 $$ LANGUAGE plpgsql;
@@ -106,13 +106,13 @@ CREATE OR REPLACE FUNCTION compute_project_revenue_daily(
 )
 RETURNS void AS $$
 DECLARE
-  current_date DATE;
+  loop_date DATE;
 BEGIN
   DELETE FROM public.project_revenue_daily
   WHERE date >= start_date AND date <= end_date;
 
-  current_date := start_date;
-  WHILE current_date <= end_date LOOP
+  loop_date := start_date;
+  WHILE loop_date <= end_date LOOP
     INSERT INTO public.project_revenue_daily (
       project_id,
       date,
@@ -124,7 +124,7 @@ BEGIN
     )
     SELECT
       e.project_id,
-      current_date,
+      loop_date,
       COALESCE(SUM(
         CASE WHEN e.event_type = 'CLIENT_INVOICE_ISSUED'
         THEN (e.payload->>'amount')::numeric
@@ -151,7 +151,7 @@ BEGIN
       ), 0) as total_revenue,
       NOW() as computed_at
     FROM public.events e
-    WHERE DATE(e.created_at) = current_date
+    WHERE DATE(e.created_at) = loop_date
       AND e.hidden = false
       AND e.project_id IS NOT NULL
     GROUP BY e.project_id
@@ -162,7 +162,7 @@ BEGIN
       total_revenue = EXCLUDED.total_revenue,
       computed_at = NOW();
 
-    current_date := current_date + INTERVAL '1 day';
+    loop_date := loop_date + INTERVAL '1 day';
   END LOOP;
 END;
 $$ LANGUAGE plpgsql;
