@@ -5,6 +5,10 @@ import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { subDays, format } from 'date-fns'
 import { DashboardKPIData } from '@/types/dashboard.types'
+import { Database } from '@/types/database.types'
+
+type ProjectCostsDaily = Database['public']['Tables']['project_costs_daily']['Row']
+type ProjectRevenueDaily = Database['public']['Tables']['project_revenue_daily']['Row']
 
 export default function ManagerResumenEjecutivoPage() {
   const [dateRange, setDateRange] = useState({
@@ -36,8 +40,10 @@ export default function ManagerResumenEjecutivoPage() {
       .lte('date', dateRange.end)
 
     // Calculate KPIs
-    const totalRevenue = revenue?.reduce((sum, r) => sum + (r.total_revenue || 0), 0) || 0
-    const totalCosts = costs?.reduce((sum, c) => sum + (c.total_cost || 0), 0) || 0
+    const revenueData = (revenue || []) as ProjectRevenueDaily[]
+    const costsData = (costs || []) as ProjectCostsDaily[]
+    const totalRevenue = revenueData.reduce((sum, r) => sum + (r.total_revenue || 0), 0)
+    const totalCosts = costsData.reduce((sum, c) => sum + (c.total_cost || 0), 0)
     const netProfit = totalRevenue - totalCosts
     const netProfitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0
 
