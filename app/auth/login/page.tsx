@@ -33,15 +33,23 @@ export default function LoginPage() {
       if (error) throw error
 
       if (data.user) {
-        // Get user role
+        // Get user data including password reset requirement
         const { data: userData } = await supabase
           .from('users')
-          .select('role')
+          .select('role, must_change_password')
           .eq('id', data.user.id)
           .single()
 
-        const userDataTyped = userData as Pick<UserRow, 'role'> | null
+        const userDataTyped = userData as Pick<UserRow, 'role' | 'must_change_password'> | null
         const role = userDataTyped?.role || 'installer'
+        const mustChangePassword = userDataTyped?.must_change_password ?? true
+
+        // If user must change password, redirect to reset page
+        if (mustChangePassword) {
+          router.push('/auth/reset-password')
+          router.refresh()
+          return
+        }
 
         // Redirect based on role
         if (role === 'admin' || role === 'developer') {

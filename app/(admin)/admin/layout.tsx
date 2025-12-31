@@ -20,11 +20,17 @@ export default async function AdminLayout({
   
   const { data: userData } = await supabase
     .from('users')
-    .select('role')
+    .select('role, must_change_password')
     .eq('id', user.id)
     .single()
   
-  const userDataTyped = userData as Pick<UserRow, 'role'> | null
+  const userDataTyped = userData as Pick<UserRow, 'role' | 'must_change_password'> | null
+  
+  // Check if password reset is required
+  if (userDataTyped?.must_change_password) {
+    redirect('/auth/reset-password')
+  }
+  
   if (userDataTyped?.role !== 'admin' && userDataTyped?.role !== 'developer') {
     redirect('/')
   }

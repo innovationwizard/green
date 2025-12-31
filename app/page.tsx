@@ -12,14 +12,20 @@ export default async function HomePage() {
     redirect('/auth/login')
   }
   
-  // Get user role
+  // Get user role and password reset requirement
   const { data: userData } = await supabase
     .from('users')
-    .select('role')
+    .select('role, must_change_password')
     .eq('id', user.id)
     .single()
 
-  const userDataTyped = userData as Pick<UserRow, 'role'> | null
+  const userDataTyped = userData as Pick<UserRow, 'role' | 'must_change_password'> | null
+  
+  // Check if password reset is required
+  if (userDataTyped?.must_change_password) {
+    redirect('/auth/reset-password')
+  }
+  
   const role = userDataTyped?.role || 'installer'
   
   // Redirect based on role
