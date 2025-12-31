@@ -27,7 +27,7 @@ export async function parseCSVQuote(file: File): Promise<ParsedQuote> {
       skipEmptyLines: true,
       complete: (results) => {
         try {
-          const quote = parseQuoteData(results.data as any[])
+          const quote = parseQuoteData(results.data as QuoteDataRow[])
           resolve(quote)
         } catch (error) {
           reject(error)
@@ -47,7 +47,7 @@ export async function parseXLSXQuote(file: File): Promise<ParsedQuote> {
         const workbook = XLSX.read(data, { type: 'array' })
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
         const jsonData = XLSX.utils.sheet_to_json(firstSheet)
-        const quote = parseQuoteData(jsonData as any[])
+        const quote = parseQuoteData(jsonData as QuoteDataRow[])
         resolve(quote)
       } catch (error) {
         reject(error)

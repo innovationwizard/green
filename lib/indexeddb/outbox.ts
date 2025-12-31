@@ -16,6 +16,7 @@ export async function addToOutbox(event: PendingEvent): Promise<void> {
   }
   
   // Store event without photos (photos stored separately)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { photos: _photos, ...eventWithoutPhotos } = event
   await tx.store.put({
     ...eventWithoutPhotos,
