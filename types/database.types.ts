@@ -323,6 +323,73 @@ export interface Database {
           updated_at?: string
         }
       }
+      project_costs_daily: {
+        Row: {
+          id: string
+          project_id: string
+          date: string
+          materials_cost: number
+          labor_cost: number
+          subcontractor_cost: number
+          expense_cost: number
+          total_cost: number
+          computed_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          date: string
+          materials_cost?: number
+          labor_cost?: number
+          subcontractor_cost?: number
+          expense_cost?: number
+          total_cost?: number
+          computed_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          date?: string
+          materials_cost?: number
+          labor_cost?: number
+          subcontractor_cost?: number
+          expense_cost?: number
+          total_cost?: number
+          computed_at?: string
+        }
+      }
+      project_revenue_daily: {
+        Row: {
+          id: string
+          project_id: string
+          date: string
+          invoice_amount: number
+          payment_amount: number
+          change_order_revenue: number
+          total_revenue: number
+          computed_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          date: string
+          invoice_amount?: number
+          payment_amount?: number
+          change_order_revenue?: number
+          total_revenue?: number
+          computed_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          date?: string
+          invoice_amount?: number
+          payment_amount?: number
+          change_order_revenue?: number
+          total_revenue?: number
+          computed_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
