@@ -22,8 +22,29 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      // Get the site URL for the redirect
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+      // Get the site URL for the redirect - PRODUCTION ONLY APP
+      // NEXT_PUBLIC_SITE_URL MUST be set in production environment
+      let siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+      
+      if (!siteUrl) {
+        // Fallback to window.location.origin (client-side only)
+        siteUrl = window.location.origin
+      }
+      
+      // CRITICAL: This is a production-only app - NEVER allow localhost
+      if (siteUrl.includes('localhost') || siteUrl.includes('127.0.0.1')) {
+        throw new Error(
+          'PRODUCTION ERROR: Site URL cannot be localhost. ' +
+          'Please set NEXT_PUBLIC_SITE_URL environment variable to your production domain (e.g., https://yourdomain.com). ' +
+          'Current URL: ' + siteUrl
+        )
+      }
+      
+      // Ensure HTTPS in production
+      if (process.env.NODE_ENV === 'production' && !siteUrl.startsWith('https://')) {
+        siteUrl = siteUrl.replace(/^http:\/\//, 'https://')
+      }
+      
       const redirectTo = `${siteUrl}/auth/reset-password-confirm`
 
       const { error } = await supabase.auth.resetPasswordForEmail(email, {

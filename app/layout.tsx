@@ -5,22 +5,39 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 // Get base URL for absolute OG image URLs (required by WhatsApp)
-// WhatsApp requires HTTPS URLs for OG images in production
+// PRODUCTION ONLY APP - Never use localhost in production
 function getBaseUrl() {
+  // Priority 1: NEXT_PUBLIC_SITE_URL (should be set in production)
   if (process.env.NEXT_PUBLIC_SITE_URL) {
     const url = process.env.NEXT_PUBLIC_SITE_URL
-    // Ensure HTTPS in production (except localhost)
-    if (process.env.NODE_ENV === 'production' && !url.includes('localhost')) {
+    // Ensure HTTPS in production and reject localhost
+    if (process.env.NODE_ENV === 'production') {
+      if (url.includes('localhost') || url.includes('127.0.0.1')) {
+        console.error('ERROR: NEXT_PUBLIC_SITE_URL cannot be localhost in production. Set it to your production domain.')
+        // Don't throw during build - let it fail at runtime instead
+        if (typeof window === 'undefined') {
+          // Server-side: use a placeholder that will fail validation
+          return 'https://PRODUCTION_URL_REQUIRED'
+        }
+      }
       return url.startsWith('https://') ? url : url.replace(/^http:\/\//, 'https://')
     }
     return url
   }
+  
+  // Priority 2: VERCEL_URL (always HTTPS, production environment)
   if (process.env.VERCEL_URL) {
-    // Vercel URLs are always HTTPS
     return `https://${process.env.VERCEL_URL}`
   }
-  // Fallback for local development (HTTP is OK for localhost)
-  return 'http://localhost:3000'
+  
+  // Priority 3: Only allow localhost in development
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3000'
+  }
+  
+  // Production without URL configured - use placeholder (will be caught at runtime)
+  console.warn('WARNING: NEXT_PUBLIC_SITE_URL or VERCEL_URL not set. This will fail at runtime in production.')
+  return 'https://PRODUCTION_URL_REQUIRED'
 }
 
 const baseUrl = getBaseUrl()
