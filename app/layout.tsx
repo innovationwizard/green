@@ -4,7 +4,23 @@ import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
+// Get base URL for absolute OG image URLs (required by WhatsApp)
+function getBaseUrl() {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`
+  }
+  // Fallback for local development
+  return 'http://localhost:3000'
+}
+
+const baseUrl = getBaseUrl()
+const ogImageUrl = `${baseUrl}/opengraph-image`
+
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: 'GREENTELLIGENCE',
   description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
   manifest: '/manifest.json',
@@ -17,12 +33,15 @@ export const metadata: Metadata = {
     title: 'GREENTELLIGENCE',
     description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
     type: 'website',
+    url: baseUrl,
+    siteName: 'GREENTELLIGENCE',
     images: [
       {
-        url: '/opengraph-image',
+        url: ogImageUrl,
         width: 1200,
         height: 630,
         alt: 'GREENTELLIGENCE',
+        type: 'image/png',
       },
     ],
   },
@@ -30,7 +49,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'GREENTELLIGENCE',
     description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
-    images: ['/opengraph-image'],
+    images: [ogImageUrl],
   },
   viewport: {
     width: 'device-width',
