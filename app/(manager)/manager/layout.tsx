@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/database.types'
+import { Logo } from '@/components/shared/logo'
+import Link from 'next/link'
 
 type UserRow = Database['public']['Tables']['users']['Row']
-import Link from 'next/link'
 
 export default async function ManagerLayout({
   children,
@@ -33,7 +34,7 @@ export default async function ManagerLayout({
       <nav className="bg-white border-b sticky top-0 z-10">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center mb-2">
-            <div className="font-semibold text-lg">GREEN APP - Dashboards</div>
+            <Logo showText={false} />
             <div className="text-sm text-muted-foreground">{userDataTyped?.full_name || user.email}</div>
           </div>
           <div className="flex gap-4 text-sm">

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Home, Plus, Clock, Wallet, RefreshCw, LogOut } from 'lucide-react'
+import { Logo } from '@/components/shared/logo'
 
 interface InstallerNavProps {
   userName: string
@@ -29,7 +30,7 @@ export default function InstallerNav({ userName }: InstallerNavProps) {
   return (
     <nav className="bg-white border-b sticky top-0 z-10">
       <div className="px-4 py-3 flex justify-between items-center">
-        <div className="font-semibold">GREEN APP</div>
+        <Logo size={20} showText={false} />
         <div className="text-sm text-muted-foreground">{userName}</div>
       </div>
       <div className="flex overflow-x-auto border-t">

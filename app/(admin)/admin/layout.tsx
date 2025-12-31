@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Database } from '@/types/database.types'
+import { Logo } from '@/components/shared/logo'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 
@@ -33,7 +34,7 @@ export default async function AdminLayout({
       <nav className="bg-white border-b sticky top-0 z-10">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center mb-2">
-            <div className="font-semibold text-lg">GREEN APP - Administración</div>
+            <Logo showText={false} />
             <div className="text-sm text-muted-foreground">{user.email}</div>
           </div>
           <div className="flex gap-4 text-sm">

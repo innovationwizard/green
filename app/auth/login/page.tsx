@@ -9,6 +9,7 @@ type UserRow = Database['public']['Tables']['users']['Row']
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Logo } from '@/components/shared/logo'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -62,8 +63,10 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>GREEN APP</CardTitle>
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <Logo size={48} />
+          </div>
           <CardDescription>Iniciar sesión</CardDescription>
         </CardHeader>
         <CardContent>
