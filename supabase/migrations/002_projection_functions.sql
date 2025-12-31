@@ -31,12 +31,12 @@ BEGIN
       loop_date,
       COALESCE(SUM(
         CASE WHEN e.event_type IN ('MATERIAL_ADDED', 'CREDIT_PURCHASE_RECORDED')
-        THEN CASE 
-          WHEN jsonb_typeof(e.payload->'items') = 'array' AND jsonb_array_length(e.payload->'items') > 0
-          THEN (SELECT SUM((item->>'quantity')::numeric * (item->>'unit_cost')::numeric)
-                FROM jsonb_array_elements(e.payload->'items') item)
-          ELSE 0
-        END
+          AND jsonb_typeof(e.payload->'items') = 'array'
+        THEN COALESCE(
+          (SELECT SUM((item->>'quantity')::numeric * (item->>'unit_cost')::numeric)
+           FROM jsonb_array_elements(e.payload->'items') item),
+          0
+        )
         ELSE 0 END
       ), 0) as materials_cost,
       COALESCE(SUM(
@@ -64,12 +64,12 @@ BEGIN
       ), 0) as expense_cost,
       COALESCE(SUM(
         CASE WHEN e.event_type IN ('MATERIAL_ADDED', 'CREDIT_PURCHASE_RECORDED')
-        THEN CASE 
-          WHEN jsonb_typeof(e.payload->'items') = 'array' AND jsonb_array_length(e.payload->'items') > 0
-          THEN (SELECT SUM((item->>'quantity')::numeric * (item->>'unit_cost')::numeric)
-                FROM jsonb_array_elements(e.payload->'items') item)
-          ELSE 0
-        END
+          AND jsonb_typeof(e.payload->'items') = 'array'
+        THEN COALESCE(
+          (SELECT SUM((item->>'quantity')::numeric * (item->>'unit_cost')::numeric)
+           FROM jsonb_array_elements(e.payload->'items') item),
+          0
+        )
         WHEN e.event_type = 'LABOR_LOGGED'
         THEN (e.payload->>'hours')::numeric * (
           SELECT rate_per_hour
