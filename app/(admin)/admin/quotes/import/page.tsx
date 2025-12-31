@@ -13,21 +13,13 @@ export default function ImportQuotePage() {
   const supabase = createClient()
   const [projectId, setProjectId] = useState<string>('')
   const [projects, setProjects] = useState<any[]>([])
-  const [file, setFile] = useState<File | null>(null)
-  
-  // Keep file state for file input
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0]
-    if (selectedFile) {
-      setFile(selectedFile)
-    }
-  }
   const [parsedQuote, setParsedQuote] = useState<ParsedQuote | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     loadProjects()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function loadProjects() {
@@ -46,7 +38,6 @@ export default function ImportQuotePage() {
     const selectedFile = e.target.files?.[0]
     if (!selectedFile) return
 
-    setFile(selectedFile)
     setError(null)
     setParsedQuote(null)
 
