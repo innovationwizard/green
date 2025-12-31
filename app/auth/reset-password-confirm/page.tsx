@@ -37,10 +37,15 @@ export default function ResetPasswordConfirmPage() {
     setLoading(true)
 
     try {
+      // Get current user first to preserve email
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      
       // Update password using Supabase Auth
       // Supabase automatically validates the token from the URL
+      // Include email to prevent Supabase from sending unnecessary confirmation emails
       const { data, error: updateError } = await supabase.auth.updateUser({
         password: newPassword,
+        email: currentUser?.email, // Preserve email to avoid triggering email change flow
       })
 
       if (updateError) {
@@ -76,17 +81,16 @@ export default function ResetPasswordConfirmPage() {
 
       const role = userData?.role || 'installer'
 
-      // Show success message briefly before redirect
-      setError(null)
-
-      // Redirect based on role
-      if (role === 'admin' || role === 'developer') {
-        router.push('/admin')
-      } else if (role === 'manager') {
-        router.push('/manager')
-      } else {
-        router.push('/installer')
-      }
+      // Clear any URL parameters that might show incorrect messages
+      // Redirect directly without query parameters
+      const redirectPath = role === 'admin' || role === 'developer' 
+        ? '/admin' 
+        : role === 'manager' 
+        ? '/manager' 
+        : '/installer'
+      
+      // Use replace instead of push to avoid back button issues and clear any state
+      router.replace(redirectPath)
       router.refresh()
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al restablecer la contraseña'

@@ -87,8 +87,11 @@ export default function ResetPasswordPage() {
       }
 
       // Update password
+      // Note: Supabase may send a confirmation email by default
+      // We explicitly set email to prevent this if not needed
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword,
+        email: user.email!, // Keep same email to avoid triggering email change confirmation
       })
 
       if (updateError) {
@@ -118,14 +121,16 @@ export default function ResetPasswordPage() {
 
       const role = userData?.role || 'installer'
 
-      // Redirect based on role
-      if (role === 'admin' || role === 'developer') {
-        router.push('/admin')
-      } else if (role === 'manager') {
-        router.push('/manager')
-      } else {
-        router.push('/installer')
-      }
+      // Clear any URL parameters that might show incorrect messages
+      // Redirect directly without query parameters
+      const redirectPath = role === 'admin' || role === 'developer' 
+        ? '/admin' 
+        : role === 'manager' 
+        ? '/manager' 
+        : '/installer'
+      
+      // Use replace instead of push to avoid back button issues
+      router.replace(redirectPath)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cambiar la contraseña')
