@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -27,14 +27,7 @@ export default function ManagerDashboardsPage() {
     end: format(new Date(), 'yyyy-MM-dd'),
   }
 
-  useEffect(() => {
-    loadExecutiveSummary()
-    // Auto-refresh every 5 minutes for real-time executive monitoring
-    const interval = setInterval(loadExecutiveSummary, 300000)
-    return () => clearInterval(interval)
-  }, [])
-
-  async function loadExecutiveSummary() {
+  const loadExecutiveSummary = useCallback(async () => {
     try {
       setError(null)
       
@@ -77,7 +70,14 @@ export default function ManagerDashboardsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase, dateRange.start, dateRange.end])
+
+  useEffect(() => {
+    loadExecutiveSummary()
+    // Auto-refresh every 5 minutes for real-time executive monitoring
+    const interval = setInterval(loadExecutiveSummary, 300000)
+    return () => clearInterval(interval)
+  }, [loadExecutiveSummary])
 
   const dashboards = [
     {

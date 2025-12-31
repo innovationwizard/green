@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -40,14 +40,7 @@ export default function MisEventosPage() {
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
-  useEffect(() => {
-    loadDashboardData()
-    // Auto-refresh every 30 seconds for field worker monitoring
-    const interval = setInterval(loadDashboardData, 30000)
-    return () => clearInterval(interval)
-  }, [])
-
-  async function loadDashboardData() {
+  const loadDashboardData = useCallback(async () => {
     try {
       setError(null)
       const { data: { user } } = await supabase.auth.getUser()
@@ -92,7 +85,14 @@ export default function MisEventosPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    loadDashboardData()
+    // Auto-refresh every 30 seconds for field worker monitoring
+    const interval = setInterval(loadDashboardData, 30000)
+    return () => clearInterval(interval)
+  }, [loadDashboardData])
 
   async function handleAnular(eventId: string, eventDate: Date) {
     if (!canAnularEvent(eventDate)) {

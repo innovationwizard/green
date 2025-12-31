@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -16,8 +16,7 @@ import {
   AlertTriangle,
   Upload,
   Download,
-  Settings,
-  ArrowRight
+  Settings
 } from 'lucide-react'
 
 interface AdminWorkMetrics {
@@ -34,14 +33,7 @@ export default function DashboardsPage() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const supabase = createClient()
 
-  useEffect(() => {
-    loadWorkMetrics()
-    // Auto-refresh every 2 minutes for operational monitoring
-    const interval = setInterval(loadWorkMetrics, 120000)
-    return () => clearInterval(interval)
-  }, [])
-
-  async function loadWorkMetrics() {
+  const loadWorkMetrics = useCallback(async () => {
     try {
       setError(null)
       
@@ -101,7 +93,14 @@ export default function DashboardsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    loadWorkMetrics()
+    // Auto-refresh every 2 minutes for operational monitoring
+    const interval = setInterval(loadWorkMetrics, 120000)
+    return () => clearInterval(interval)
+  }, [loadWorkMetrics])
 
   const dashboards = [
     {

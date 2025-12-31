@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getSyncStatus } from '@/lib/indexeddb/outbox'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -39,14 +39,7 @@ export default function DevDashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
-  useEffect(() => {
-    loadSystemStatus()
-    // Auto-refresh every 30 seconds for real-time monitoring
-    const interval = setInterval(loadSystemStatus, 30000)
-    return () => clearInterval(interval)
-  }, [])
-
-  async function loadSystemStatus() {
+  const loadSystemStatus = useCallback(async () => {
     try {
       setError(null)
       
@@ -133,7 +126,14 @@ export default function DevDashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    loadSystemStatus()
+    // Auto-refresh every 30 seconds for real-time monitoring
+    const interval = setInterval(loadSystemStatus, 30000)
+    return () => clearInterval(interval)
+  }, [loadSystemStatus])
 
   if (loading && !status) {
     return (

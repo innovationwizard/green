@@ -96,9 +96,8 @@ export default function ResetPasswordPage() {
       }
 
       // Mark password as changed in database
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: dbError } = await (supabase
-        .from('users') as any)
+      const { error: dbError } = await supabase
+        .from('users')
         .update({
           must_change_password: false,
           password_changed_at: new Date().toISOString(),
