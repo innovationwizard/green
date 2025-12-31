@@ -108,6 +108,10 @@ export default function LoginPage() {
               {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </Button>
           </form>
+
+          <p className="text-xs text-gray-400 text-center mt-6">
+            Powered by <span style={{ color: '#dc2626' }}>Artificial Intelligence Developments</span> © 2025
+          </p>
         </CardContent>
       </Card>
     </div>
