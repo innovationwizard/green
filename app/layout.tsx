@@ -25,10 +25,6 @@ export const metadata: Metadata = {
   description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
   manifest: '/manifest.json',
   themeColor: '#16a34a',
-  icons: {
-    icon: '/icon.svg',
-    apple: '/icon.svg',
-  },
   openGraph: {
     title: 'GREENTELLIGENCE',
     description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
