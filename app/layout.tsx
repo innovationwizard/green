@@ -5,14 +5,21 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 // Get base URL for absolute OG image URLs (required by WhatsApp)
+// WhatsApp requires HTTPS URLs for OG images in production
 function getBaseUrl() {
   if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL
+    const url = process.env.NEXT_PUBLIC_SITE_URL
+    // Ensure HTTPS in production (except localhost)
+    if (process.env.NODE_ENV === 'production' && !url.includes('localhost')) {
+      return url.startsWith('https://') ? url : url.replace(/^http:\/\//, 'https://')
+    }
+    return url
   }
   if (process.env.VERCEL_URL) {
+    // Vercel URLs are always HTTPS
     return `https://${process.env.VERCEL_URL}`
   }
-  // Fallback for local development
+  // Fallback for local development (HTTP is OK for localhost)
   return 'http://localhost:3000'
 }
 
@@ -26,12 +33,16 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   themeColor: '#16a34a',
   icons: {
+    // SVG favicon for modern browsers (scalable, crisp at any size)
     icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon.svg', type: 'image/svg+xml', sizes: 'any' },
     ],
+    // Apple touch icon - iOS requires 180x180 with solid background
     apple: [
       { url: '/apple-icon', type: 'image/png', sizes: '180x180' },
     ],
+    // PWA icons are handled via manifest.json
+    // Additional sizes can be added here if needed for specific browser support
   },
   openGraph: {
     title: 'GREENTELLIGENCE',

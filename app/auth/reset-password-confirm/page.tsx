@@ -1,8 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Database } from '@/types/database.types'
+
+type UserRow = Database['public']['Tables']['users']['Row']
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
@@ -13,27 +16,8 @@ export default function ResetPasswordConfirmPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [checking, setChecking] = useState(true)
-  const [validToken, setValidToken] = useState(false)
   const router = useRouter()
-  const searchParams = useSearchParams()
   const supabase = createClient()
-
-  useEffect(() => {
-    // Check if we have a valid password reset token
-    const checkToken = async () => {
-      // Supabase handles the token via URL hash, so we check if user session is valid
-      // The token is automatically processed by Supabase when the page loads
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      // If user is null, the token might be invalid or expired
-      // But we still allow them to try to reset (Supabase will handle validation)
-      setValidToken(true)
-      setChecking(false)
-    }
-
-    checkToken()
-  }, [supabase])
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,6 +54,8 @@ export default function ResetPasswordConfirmPage() {
       // Mark password as changed in database
       const { error: dbError } = await supabase
         .from('users')
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error - Supabase type inference fails for update operations
         .update({
           must_change_password: false,
           password_changed_at: new Date().toISOString(),
@@ -86,7 +72,7 @@ export default function ResetPasswordConfirmPage() {
         .from('users')
         .select('role')
         .eq('id', data.user.id)
-        .single()
+        .single() as { data: Pick<UserRow, 'role'> | null }
 
       const role = userData?.role || 'installer'
 
@@ -113,17 +99,6 @@ export default function ResetPasswordConfirmPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  if (checking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-sm text-muted-foreground">Verificando enlace...</p>
-        </div>
-      </div>
-    )
   }
 
   return (

@@ -2,6 +2,8 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { Database } from '@/types/database.types'
 
+type UserRow = Database['public']['Tables']['users']['Row']
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
     request: {
@@ -69,7 +71,7 @@ export async function updateSession(request: NextRequest) {
       .from('users')
       .select('must_change_password')
       .eq('id', user.id)
-      .single()
+      .single() as { data: Pick<UserRow, 'must_change_password'> | null }
 
     if (userData?.must_change_password) {
       const url = request.nextUrl.clone()

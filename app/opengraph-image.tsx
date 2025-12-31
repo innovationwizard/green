@@ -6,6 +6,8 @@ export const size = {
   width: 1200,
   height: 630,
 }
+// PNG format - WhatsApp supports PNG. ImageResponse generates optimized PNG files.
+// Simple design (gradient + SVG + text) ensures file size stays well under 300KB limit.
 export const contentType = 'image/png'
 
 export default async function Image() {
@@ -41,11 +43,11 @@ export default async function Image() {
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <path d="M14 2v6h6"/>
-            <path d="M10 18v-6"/>
-            <path d="M14 14v-2"/>
-            <path d="M18 18v-4"/>
+            <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/>
+            <path d="M14 2v5a1 1 0 0 0 1 1h5"/>
+            <path d="M8 18v-2"/>
+            <path d="M12 18v-4"/>
+            <path d="M16 18v-6"/>
           </svg>
         </div>
         <div
@@ -73,6 +75,8 @@ export default async function Image() {
     ),
     {
       ...size,
+      // ImageResponse generates optimized PNG files
+      // Simple design ensures file size stays well under WhatsApp's 300KB limit
     }
   )
 }

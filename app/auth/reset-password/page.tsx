@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Database } from '@/types/database.types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 import { Logo } from '@/components/shared/logo'
+
+type UserRow = Database['public']['Tables']['users']['Row']
 
 export default function ResetPasswordPage() {
   const [currentPassword, setCurrentPassword] = useState('')
@@ -31,7 +34,7 @@ export default function ResetPasswordPage() {
         .from('users')
         .select('must_change_password')
         .eq('id', user.id)
-        .single()
+        .single() as { data: Pick<UserRow, 'must_change_password'> | null }
 
       if (!userData?.must_change_password) {
         // User doesn't need to change password, redirect to dashboard
@@ -93,8 +96,9 @@ export default function ResetPasswordPage() {
       }
 
       // Mark password as changed in database
-      const { error: dbError } = await supabase
-        .from('users')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: dbError } = await (supabase
+        .from('users') as any)
         .update({
           must_change_password: false,
           password_changed_at: new Date().toISOString(),
@@ -111,7 +115,7 @@ export default function ResetPasswordPage() {
         .from('users')
         .select('role')
         .eq('id', user.id)
-        .single()
+        .single() as { data: Pick<UserRow, 'role'> | null }
 
       const role = userData?.role || 'installer'
 

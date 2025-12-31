@@ -44,6 +44,8 @@ export interface Database {
           created_at: string
           updated_at: string
           created_by: string | null
+          must_change_password: boolean
+          password_changed_at: string | null
         }
         Insert: {
           id: string
@@ -52,6 +54,8 @@ export interface Database {
           role?: UserRole
           active?: boolean
           created_by?: string | null
+          must_change_password?: boolean
+          password_changed_at?: string | null
         }
         Update: {
           id?: string
@@ -61,6 +65,8 @@ export interface Database {
           active?: boolean
           updated_at?: string
           created_by?: string | null
+          must_change_password?: boolean
+          password_changed_at?: string | null
         }
       }
       projects: {
