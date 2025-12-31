@@ -43,37 +43,64 @@
 
 ### UI de Instalador
 - [x] Layout y navegación de instalador
-- [x] Página de eventos (Mis Eventos)
+- [x] **Landing page con dashboard completo**: Estado de sincronización, balance de caja, eventos recientes
+- [x] Página de eventos (Mis Eventos) - Mejorada con métricas y estado offline/online
 - [x] Página de creación de eventos (Nuevo Evento)
 - [x] Formulario de material agregado
 - [x] Formulario de gastos
 - [x] Temporizador (start/stop + entrada manual)
 - [x] Página de caja (balance + últimos movimientos)
 - [x] Página de sincronización (estado + sincronización manual)
-- [x] Funcionalidad de Anular eventos
+- [x] Funcionalidad de Anular eventos - Implementación completa con API
 
 ### UI de Administrador
 - [x] Layout de administrador
-- [x] Página de dashboards (listado)
+- [x] **Landing page con panel administrativo**: Métricas operacionales, cola de trabajo, acciones rápidas
+- [x] Página de dashboards (listado mejorado)
 - [x] Dashboard de Resumen Ejecutivo (KPIs básicos)
 - [x] Estructura para otros dashboards
+
+### UI de Manager (CEO)
+- [x] Layout de manager
+- [x] **Landing page con resumen ejecutivo**: KPIs a primera vista (ingresos, costos, utilidad, margen)
+- [x] Página de dashboards (listado mejorado)
+- [x] Dashboard de Resumen Ejecutivo (KPIs básicos)
+- [x] Estructura para otros dashboards
+
+### UI de Developer (Superusuario)
+- [x] Layout de developer (ruta top-level `/dev/*`)
+- [x] **Developer Dashboard**: Monitoreo de salud del sistema, métricas en tiempo real
+- [x] Acceso rápido a todas las interfaces (Admin, Manager, Installer)
+- [x] Herramientas de soporte y debugging
 
 ### Cálculos y Proyecciones
 - [x] Cálculo de balance de caja por instalador
 - [x] Funciones SQL para proyecciones diarias
 - [x] Sistema de checkpoint para procesamiento incremental
 
+### Componentes UI
+- [x] Componentes base (Button, Card, Input)
+- [x] **Componente Alert**: Para mostrar errores y alertas al usuario
+- [x] Componente Logo (con icono FileChartColumnIncreasing)
+- [x] Componente ExportButton
+
 ### Utilidades
 - [x] Generación de UUIDs
 - [x] Device ID persistente
 - [x] Utilidades de timezone (Guatemala)
 - [x] Helpers de formato y cálculo
+- [x] Manejo de errores enterprise-grade en todas las landing pages
+- [x] Auto-refresh en dashboards (30s-5min según rol)
+- [x] Queries paralelas para mejor performance
 
 ### Documentación
-- [x] README completo
+- [x] README completo (actualizado con nuevas landing pages)
 - [x] Guía de configuración (SETUP.md)
 - [x] Plan de construcción (BUILD_PLAN.md)
 - [x] Documentación de estructura
+- [x] **DEVELOPMENT_RULES.md**: 5 reglas estrictas de desarrollo y descripción de roles
+- [x] **ROLES.md**: Documentación completa de roles con mejores prácticas de la industria
+- [x] **SUPABASE_CONFIG_REQUIRED.md**: Guía de configuración de Supabase Dashboard
 
 ## 🚧 Parcialmente Implementado
 
@@ -143,8 +170,12 @@
 - **Offline**: ✅ 90% (funcional, falta optimización de conflictos)
 - **Sincronización**: ✅ 80% (básica funcionando, falta detección avanzada de duplicados)
 - **Dashboards**: ✅ 25% (1 de 4 completo)
-- **Admin UI**: ✅ 30% (estructura creada, falta CRUD completo)
+- **Admin UI**: ✅ 50% (estructura creada + landing page completa, falta CRUD completo)
+- **Manager UI**: ✅ 50% (landing page completa con KPIs, falta dashboards detallados)
+- **Installer UI**: ✅ 95% (landing page completa, todas las funcionalidades core)
+- **Developer UI**: ✅ 100% (dashboard completo con monitoreo y herramientas)
 - **Proyecciones**: ✅ 70% (funciones SQL creadas, falta scheduled jobs)
+- **Landing Pages**: ✅ 100% (todas las landing pages implementadas siguiendo mejores prácticas)
 
 ## 🚀 Listo para Producción
 

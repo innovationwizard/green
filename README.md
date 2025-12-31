@@ -23,6 +23,11 @@ Sistema completo de gestión operativa para empresas de energía solar EPC (Engi
 - **Estilos**: Tailwind CSS, shadcn/ui
 - **Gráficos**: Recharts
 - **PWA**: next-pwa
+- **Dependencias Principales**:
+  - `@supabase/ssr`: ^0.8.0 (autenticación SSR)
+  - `jspdf`: ^3.0.4 (generación de PDFs)
+  - `xlsx`: ^0.18.5 (importación/exportación Excel)
+  - `lucide-react`: ^0.562.0 (iconos)
 
 ## Requisitos Previos
 
@@ -95,6 +100,7 @@ green/
 │   ├── (installer)/       # Rutas de instalador
 │   ├── (admin)/           # Rutas de administrador
 │   ├── (manager)/         # Rutas de gerente
+│   ├── (dev)/             # Rutas de desarrollador (superusuario)
 │   └── api/               # API routes
 ├── components/
 │   ├── installer/         # Componentes específicos de instalador
@@ -119,26 +125,49 @@ green/
 ## Roles y Permisos
 
 - **Installer**: Puede crear eventos offline, sincronizar, anular sus propios eventos hasta el sábado 23:59. Ruta: `/installer/*`
+  - Landing page: Dashboard con estado de sincronización, balance de caja, y eventos recientes
 - **Admin**: Personal administrativo/contabilidad/papeleo. Acceso completo a CRUD, dashboards, eliminación de eventos, configuración. Ruta: `/admin/*`
+  - Landing page: Panel administrativo con métricas operacionales, cola de trabajo (excepciones pendientes), y acciones rápidas
 - **Manager**: CEO/Decision maker. Solo lectura de dashboards y visibilidad. Ruta: `/manager/*`
+  - Landing page: Dashboards ejecutivos con resumen ejecutivo (KPIs) a primera vista y acceso rápido a dashboards detallados
 - **Developer**: Superusuario técnico (soporte/debugging). Acceso completo a TODAS las rutas: `/dev/*`, `/admin/*`, `/manager/*`, `/installer/*`. **IMPORTANTE:** Developer es completamente separado de Admin (no está anidado bajo admin).
+  - Landing page: Dashboard de desarrollador con monitoreo de salud del sistema, métricas en tiempo real, y herramientas de soporte
+
+Ver `ROLES.md` y `DEVELOPMENT_RULES.md` para detalles completos sobre roles y mejores prácticas.
 
 ## Funcionalidades Clave
 
 ### Para Instaladores
 
-1. **Crear Eventos**: Materiales, gastos, mano de obra, subcontratistas, etc.
-2. **Temporizador**: Registro de horas trabajadas con timer o entrada manual
-3. **Mi Caja**: Balance y últimos 5 movimientos de efectivo
-4. **Sincronización**: Estado de sincronización y sincronización manual
+1. **Dashboard de Inicio**: Vista general con estado de sincronización, balance de caja, y eventos recientes
+2. **Crear Eventos**: Materiales, gastos, mano de obra, subcontratistas, etc.
+3. **Temporizador**: Registro de horas trabajadas con timer o entrada manual
+4. **Mi Caja**: Balance y últimos 5 movimientos de efectivo
+5. **Sincronización**: Estado de sincronización y sincronización manual
 
 ### Para Administradores
 
-1. **Dashboards**: 4 dashboards ejecutivos con KPIs y gráficos
-2. **Gestión de Master Data**: Proyectos, items, clientes, usuarios, tarifas
-3. **Importación de Cotizaciones**: CSV/XLSX y extracción de PDF
-4. **Centro de Excepciones**: Duplicados y alertas de omisión
-5. **Exportación de Auditoría**: CSV/XLSX/PDF con trazabilidad completa
+1. **Panel Administrativo**: Landing page con métricas operacionales (excepciones pendientes, eventos recientes, proyectos totales)
+2. **Cola de Trabajo**: Indicadores visuales de tareas que requieren atención
+3. **Acciones Rápidas**: Acceso directo a excepciones, importación, exportación, proyecciones, configuración
+4. **Dashboards**: 4 dashboards ejecutivos con KPIs y gráficos
+5. **Gestión de Master Data**: Proyectos, items, clientes, usuarios, tarifas
+6. **Importación de Cotizaciones**: CSV/XLSX y extracción de PDF
+7. **Centro de Excepciones**: Duplicados y alertas de omisión
+8. **Exportación de Auditoría**: CSV/XLSX/PDF con trazabilidad completa
+
+### Para Managers (CEO)
+
+1. **Dashboards Ejecutivos**: Landing page con resumen ejecutivo (KPIs) a primera vista
+2. **Métricas Clave**: Ingresos, costos, utilidad neta, margen de utilidad (últimos 30 días)
+3. **Dashboards Detallados**: Acceso rápido a 4 dashboards ejecutivos completos
+
+### Para Developers (Superusuario)
+
+1. **Developer Dashboard**: Monitoreo de salud del sistema en tiempo real
+2. **Métricas del Sistema**: Usuarios activos, eventos, excepciones, estado de proyecciones, sincronización
+3. **Acceso Rápido**: Enlaces directos a todas las interfaces (Admin, Manager, Installer)
+4. **Herramientas de Soporte**: Centro de excepciones, exportación de auditoría, configuración, proyecciones
 
 ## Sistema de Eventos
 
