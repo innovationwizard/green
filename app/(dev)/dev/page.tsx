@@ -62,10 +62,11 @@ export default function DevDashboardPage() {
         (async () => {
           const sevenDaysAgo = new Date()
           sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-          return supabase
+          const result = await supabase
             .from('events')
             .select('created_by')
             .gte('created_at', sevenDaysAgo.toISOString())
+          return result as { data: Array<{ created_by: string }> | null; error: unknown }
         })(),
         
         // Total events
@@ -102,7 +103,9 @@ export default function DevDashboardPage() {
       ])
 
       // Extract active users count
-      const activeUserIds = new Set(recentEventsResult.data?.map(e => e.created_by) || [])
+      const activeUserIds = new Set(
+        (recentEventsResult.data as Array<{ created_by: string }> | null)?.map((e: { created_by: string }) => e.created_by) || []
+      )
       const activeUsers = activeUserIds.size
 
       // Handle projection data error gracefully
@@ -117,7 +120,9 @@ export default function DevDashboardPage() {
         syncErrors: syncStatusResult.errors,
         lastSyncTime: syncStatusResult.lastSyncTime,
         exceptionsCount: exceptionsResult.count || 0,
-        lastProjectionUpdate: projectionData?.updated_at || null,
+        lastProjectionUpdate: projectionData 
+          ? (projectionData as { updated_at: string }).updated_at 
+          : null,
       })
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido al cargar el estado del sistema'

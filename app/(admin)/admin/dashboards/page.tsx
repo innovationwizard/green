@@ -79,11 +79,16 @@ export default function DashboardsPage() {
       if (recentEventsResult.error) throw recentEventsResult.error
       if (projectsResult.error) throw projectsResult.error
 
+      // Handle projection result (may be null if no data exists)
+      const projectionData = projectionResult.error ? null : projectionResult.data
+
       setMetrics({
         pendingExceptions: exceptionsResult.count || 0,
         recentEvents24h: recentEventsResult.count || 0,
         totalProjects: projectsResult.count || 0,
-        lastProjectionUpdate: projectionResult.data?.updated_at || null,
+        lastProjectionUpdate: projectionData 
+          ? (projectionData as { updated_at: string }).updated_at 
+          : null,
       })
       setLastUpdated(new Date())
     } catch (err) {

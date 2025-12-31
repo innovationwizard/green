@@ -101,7 +101,7 @@ export default function ResetPasswordPage() {
         .update({
           must_change_password: false,
           password_changed_at: new Date().toISOString(),
-        })
+        } as never)
         .eq('id', user.id)
 
       if (dbError) {
