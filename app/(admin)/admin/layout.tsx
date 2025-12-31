@@ -34,6 +34,7 @@ export default async function AdminLayout({
           </div>
           <div className="flex gap-4 text-sm">
             <Link href="/admin/dashboards" className="hover:text-primary">Dashboards</Link>
+            <Link href="/admin/projections" className="hover:text-primary">Proyecciones</Link>
             <Link href="/admin/quotes/import" className="hover:text-primary">Importar Cotización</Link>
             <Link href="/admin/exceptions" className="hover:text-primary">Excepciones</Link>
             <Link href="/admin/audit/export" className="hover:text-primary">Auditoría</Link>
