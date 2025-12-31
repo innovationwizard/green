@@ -14,6 +14,8 @@ export async function GET() {
     const endDateStr = endDate.toISOString().split('T')[0]
     
     // Execute projection functions
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Supabase type inference fails for RPC calls
     const { error: costsError } = await supabase.rpc('compute_project_costs_daily', {
       start_date: startDateStr,
       end_date: endDateStr,
@@ -23,6 +25,8 @@ export async function GET() {
       console.error('Error computing costs:', costsError)
     }
     
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Supabase type inference fails for RPC calls
     const { error: revenueError } = await supabase.rpc('compute_project_revenue_daily', {
       start_date: startDateStr,
       end_date: endDateStr,
@@ -33,6 +37,8 @@ export async function GET() {
     }
     
     // Update checkpoint
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Supabase type inference fails for RPC calls
     const { error: checkpointError } = await supabase.rpc('update_projection_checkpoint')
     
     if (checkpointError) {

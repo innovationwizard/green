@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/client'
 import { PendingEvent, EventPayload } from '@/types/events.types'
-import { EventType } from '@/types/database.types'
+import { EventType, Database } from '@/types/database.types'
+
+type EventRow = Database['public']['Tables']['events']['Row']
 
 export interface DuplicateCheckResult {
   isDuplicate: boolean
@@ -40,6 +42,8 @@ export async function checkDuplicateEvent(
     return { isDuplicate: false, similarEvents: [] }
   }
 
+  const sameDayEventsTyped = sameDayEvents as Pick<EventRow, 'id' | 'created_at' | 'payload' | 'event_type'>[]
+
   // For material events, compare item lines
   if (event.event_type === 'MATERIAL_ADDED' && 'items' in event.payload) {
     const materialPayload = event.payload as { items?: Array<{ item_id: string; quantity: number }> }
@@ -49,8 +53,8 @@ export async function checkDuplicateEvent(
       .sort()
       .join('|')
 
-    const similarEvents = sameDayEvents.filter((existingEvent) => {
-      const existingPayload = existingEvent.payload as { items?: Array<{ item_id: string; quantity: number }> }
+    const similarEvents = sameDayEventsTyped.filter((existingEvent) => {
+      const existingPayload = existingEvent.payload as unknown as { items?: Array<{ item_id: string; quantity: number }> }
       if (!existingPayload.items) return false
 
       const existingItems = existingPayload.items || []
@@ -67,13 +71,13 @@ export async function checkDuplicateEvent(
       similarEvents: similarEvents.map((e) => ({
         id: e.id,
         created_at: e.created_at,
-        payload: e.payload,
+        payload: e.payload as unknown as EventPayload<EventType>,
       })),
     }
   }
 
   // For other event types, compare payload structure
-  const similarEvents = sameDayEvents.filter((existingEvent) => {
+  const similarEvents = sameDayEventsTyped.filter((existingEvent) => {
     return JSON.stringify(existingEvent.payload) === JSON.stringify(event.payload)
   })
 
@@ -82,7 +86,7 @@ export async function checkDuplicateEvent(
     similarEvents: similarEvents.map((e) => ({
       id: e.id,
       created_at: e.created_at,
-      payload: e.payload,
+      payload: e.payload as unknown as EventPayload<EventType>,
     })),
   }
 }
@@ -106,9 +110,10 @@ export async function flagDuplicateEvents(): Promise<void> {
 
   if (!todayEvents || todayEvents.length === 0) return
 
+  const todayEventsTyped = todayEvents as EventRow[]
   // Group by project_id, event_type
-  const groups = new Map<string, typeof todayEvents>()
-  for (const event of todayEvents) {
+  const groups = new Map<string, EventRow[]>()
+  for (const event of todayEventsTyped) {
     const key = `${event.project_id}:${event.event_type}`
     if (!groups.has(key)) {
       groups.set(key, [])
@@ -123,7 +128,7 @@ export async function flagDuplicateEvents(): Promise<void> {
     // For material events, compare item lines
     if (events[0].event_type === 'MATERIAL_ADDED') {
       const itemSignatures = events.map((e) => {
-        const payload = e.payload as { items?: Array<{ item_id: string; quantity: number }> }
+        const payload = e.payload as unknown as { items?: Array<{ item_id: string; quantity: number }> }
         const items = payload.items || []
         return items
           .map((item) => `${item.item_id}:${item.quantity}`)
@@ -139,6 +144,8 @@ export async function flagDuplicateEvents(): Promise<void> {
           // Flag as duplicate (keep first, flag rest)
           await supabase
             .from('events')
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore - Supabase type inference fails for update operations
             .update({ duplicate_flag: true })
             .eq('id', events[i].id)
         } else {
@@ -153,6 +160,8 @@ export async function flagDuplicateEvents(): Promise<void> {
         if (seen.has(payloadStr)) {
           await supabase
             .from('events')
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore - Supabase type inference fails for update operations
             .update({ duplicate_flag: true })
             .eq('id', events[i].id)
         } else {

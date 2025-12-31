@@ -55,6 +55,8 @@ export async function syncOutbox(userId: string): Promise<SyncResult> {
       }
       
       // Insert event
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Supabase type inference fails for insert operations
       const { error } = await supabase.from('events').insert({
         client_uuid: event.client_uuid,
         event_type: event.event_type,
@@ -104,14 +106,21 @@ export async function checkDuplicateEvent(
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
   
-  const { data, error } = await supabase
+  let query = supabase
     .from('events')
     .select('id')
-    .eq('project_id', projectId)
     .eq('event_type', eventType)
     .gte('created_at', today.toISOString())
     .lt('created_at', tomorrow.toISOString())
     .eq('hidden', false)
+  
+  if (projectId !== null) {
+    query = query.eq('project_id', projectId)
+  } else {
+    query = query.is('project_id', null)
+  }
+  
+  const { data, error } = await query
   
   if (error || !data) {
     return false

@@ -1,5 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { Database } from '@/types/database.types'
+
+type UserRow = Database['public']['Tables']['users']['Row']
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -15,8 +18,9 @@ export default async function HomePage() {
     .select('role')
     .eq('id', user.id)
     .single()
-  
-  const role = userData?.role || 'installer'
+
+  const userDataTyped = userData as Pick<UserRow, 'role'> | null
+  const role = userDataTyped?.role || 'installer'
   
   // Redirect based on role
   if (role === 'admin' || role === 'developer') {

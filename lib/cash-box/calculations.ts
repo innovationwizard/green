@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/client'
-import { EventType } from '@/types/database.types'
+import { EventType, Database } from '@/types/database.types'
 import { EventPayloadMap } from '@/types/events.types'
+
+type EventRow = Database['public']['Tables']['events']['Row']
 
 export interface CashBoxMovement {
   id: string
@@ -38,16 +40,18 @@ export async function getCashBoxBalance(userId: string): Promise<{
     return { balance: 0, movements: [] }
   }
   
+  const eventsTyped = events as Pick<EventRow, 'id' | 'event_type' | 'payload' | 'created_at' | 'created_by'>[]
+  
   let balance = 0
   const movements: CashBoxMovement[] = []
   
   // Process events in chronological order
-  const sortedEvents = [...events].sort(
+  const sortedEvents = [...eventsTyped].sort(
     (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
   )
   
   for (const event of sortedEvents) {
-    const payload = event.payload as EventPayloadMap[EventType]
+    const payload = event.payload as unknown as EventPayloadMap[EventType]
     let amount = 0
     let description = ''
     

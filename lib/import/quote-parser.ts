@@ -94,10 +94,10 @@ function parseQuoteData(data: QuoteDataRow[]): ParsedQuote {
   // - Summary rows may contain: TOTAL, MATERIALES, MANO_OBRA, SUBCONTRATISTAS, GASTOS, TAMAÑO_KW, DURACIÓN_DÍAS
 
   for (const row of data) {
-    const productName = row.Producto || row['Producto/Código'] || row.Item || row.product_name || ''
-    const quantity = parseFloat(row.Cantidad || row.Qty || row.quantity || '0')
-    const unitPrice = parseFloat(row['Precio Unitario'] || row['Unit Price'] || row.unit_price || '0')
-    const total = parseFloat(row.Total || row.Amount || row.total || '0')
+    const productName = String(row.Producto || row['Producto/Código'] || row.Item || row.product_name || '')
+    const quantity = parseFloat(String(row.Cantidad || row.Qty || row.quantity || '0'))
+    const unitPrice = parseFloat(String(row['Precio Unitario'] || row['Unit Price'] || row.unit_price || '0'))
+    const total = parseFloat(String(row.Total || row.Amount || row.total || '0'))
     const description = row.Descripción || row.Description || row.Notes || row.description || ''
 
     // Check if this is a summary row

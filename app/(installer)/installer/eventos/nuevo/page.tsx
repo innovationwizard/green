@@ -9,7 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { getCachedProjects, CachedProject } from '@/lib/indexeddb/projects'
 import { searchItems, CachedItem } from '@/lib/indexeddb/items'
-import { EventType, MaterialSource, PaymentMethod } from '@/types/database.types'
+import { EventType, MaterialSource, PaymentMethod, Database } from '@/types/database.types'
+
+type ProjectRow = Database['public']['Tables']['projects']['Row']
 
 export default function NuevoEventoPage() {
   const router = useRouter()
@@ -38,7 +40,8 @@ export default function NuevoEventoPage() {
         .limit(100)
       
       if (data) {
-        const formatted = data.map(p => ({
+        const dataTyped = data as Pick<ProjectRow, 'id' | 'human_id' | 'client_id' | 'installation_address' | 'project_type' | 'size_kw' | 'price' | 'status'>[]
+        const formatted = dataTyped.map(p => ({
           ...p,
           cached_at: Date.now(),
         }))
@@ -93,13 +96,13 @@ export default function NuevoEventoPage() {
           }
           
           if (source === 'purchase') {
-            payload.vendor = formData.get('vendor') || ''
-            payload.payment_method = formData.get('payment_method') as PaymentMethod || 'cash'
+            payload.vendor = (formData.get('vendor') as string) || ''
+            payload.payment_method = (formData.get('payment_method') as PaymentMethod) || 'cash'
           } else if (source === 'warehouse') {
-            payload.warehouse_id = formData.get('warehouse_id') || ''
-            payload.issuer = formData.get('issuer') || ''
+            payload.warehouse_id = (formData.get('warehouse_id') as string) || ''
+            payload.issuer = (formData.get('issuer') as string) || ''
           } else if (source === 'borrowed') {
-            payload.from_project_id = formData.get('from_project_id') || ''
+            payload.from_project_id = (formData.get('from_project_id') as string) || ''
           }
           
           await createEvent(eventType, projectId, payload)

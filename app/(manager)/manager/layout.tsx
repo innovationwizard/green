@@ -1,5 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { Database } from '@/types/database.types'
+
+type UserRow = Database['public']['Tables']['users']['Row']
 import Link from 'next/link'
 
 export default async function ManagerLayout({
@@ -20,7 +23,8 @@ export default async function ManagerLayout({
     .eq('id', user.id)
     .single()
   
-  if (userData?.role !== 'manager') {
+  const userDataTyped = userData as Pick<UserRow, 'role' | 'full_name'> | null
+  if (userDataTyped?.role !== 'manager') {
     redirect('/')
   }
   
@@ -30,7 +34,7 @@ export default async function ManagerLayout({
         <div className="px-4 py-3">
           <div className="flex justify-between items-center mb-2">
             <div className="font-semibold text-lg">GREEN APP - Dashboards</div>
-            <div className="text-sm text-muted-foreground">{userData.full_name || user.email}</div>
+            <div className="text-sm text-muted-foreground">{userDataTyped?.full_name || user.email}</div>
           </div>
           <div className="flex gap-4 text-sm">
             <Link href="/manager/dashboards" className="hover:text-primary">Dashboards</Link>

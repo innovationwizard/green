@@ -1,5 +1,6 @@
 import { addToOutbox } from '@/lib/indexeddb/outbox'
-import { PendingEvent, EventPayload, EventType } from '@/types/events.types'
+import { PendingEvent, EventPayload } from '@/types/events.types'
+import { EventType } from '@/types/database.types'
 import { generateUUID } from '@/lib/utils/uuid'
 import { getDeviceId } from '@/lib/utils/device-id'
 

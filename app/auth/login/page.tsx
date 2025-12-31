@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Database } from '@/types/database.types'
+
+type UserRow = Database['public']['Tables']['users']['Row']
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -36,7 +39,8 @@ export default function LoginPage() {
           .eq('id', data.user.id)
           .single()
 
-        const role = userData?.role || 'installer'
+        const userDataTyped = userData as Pick<UserRow, 'role'> | null
+        const role = userDataTyped?.role || 'installer'
 
         // Redirect based on role
         if (role === 'admin' || role === 'developer') {

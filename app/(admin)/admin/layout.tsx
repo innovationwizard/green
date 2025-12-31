@@ -1,6 +1,9 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { Database } from '@/types/database.types'
+
+type UserRow = Database['public']['Tables']['users']['Row']
 
 export default async function AdminLayout({
   children,
@@ -20,7 +23,8 @@ export default async function AdminLayout({
     .eq('id', user.id)
     .single()
   
-  if (userData?.role !== 'admin' && userData?.role !== 'developer') {
+  const userDataTyped = userData as Pick<UserRow, 'role'> | null
+  if (userDataTyped?.role !== 'admin' && userDataTyped?.role !== 'developer') {
     redirect('/')
   }
   

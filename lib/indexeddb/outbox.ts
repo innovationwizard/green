@@ -1,5 +1,6 @@
 import { getDB } from './db'
-import { PendingEvent } from '@/types/events.types'
+import { PendingEvent, EventPayload } from '@/types/events.types'
+import { EventType } from '@/types/database.types'
 
 export async function addToOutbox(event: PendingEvent): Promise<void> {
   const db = await getDB()
@@ -20,6 +21,7 @@ export async function addToOutbox(event: PendingEvent): Promise<void> {
   const { photos: _photos, ...eventWithoutPhotos } = event
   await tx.store.put({
     ...eventWithoutPhotos,
+    payload: eventWithoutPhotos.payload as unknown as Record<string, unknown>,
     synced: false,
   })
   
@@ -42,6 +44,7 @@ export async function getOutboxEvents(): Promise<PendingEvent[]> {
     
     eventsWithPhotos.push({
       ...event,
+      payload: event.payload as unknown as EventPayload<EventType>,
       photos: photoData?.files,
     })
   }

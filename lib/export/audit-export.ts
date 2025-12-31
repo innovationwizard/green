@@ -1,5 +1,9 @@
 import { createClient } from '@/lib/supabase/client'
 import { exportData, ExportData } from './export-service'
+import { Database } from '@/types/database.types'
+import { format as formatDate } from 'date-fns'
+
+type EventRow = Database['public']['Tables']['events']['Row']
 
 export async function exportAuditLog(
   startDate: Date,
@@ -23,6 +27,13 @@ export async function exportAuditLog(
     throw new Error(`Error al cargar eventos: ${error.message}`)
   }
 
+  type EventWithRelations = EventRow & {
+    project?: { human_id?: string } | null
+    created_by_user?: { full_name?: string; email?: string } | null
+  }
+
+  const eventsTyped = (events || []) as EventWithRelations[]
+
   const headers = [
     'ID',
     'UUID Cliente',
@@ -38,7 +49,7 @@ export async function exportAuditLog(
     'Razón',
   ]
 
-  const rows = (events || []).map((event) => {
+  const rows = eventsTyped.map((event) => {
     const project = event.project as { human_id?: string } | null
     const user = event.created_by_user as { full_name?: string; email?: string } | null
     return [
@@ -47,7 +58,7 @@ export async function exportAuditLog(
       event.event_type,
       project?.human_id || '',
       user?.full_name || user?.email || '',
-      format(new Date(event.created_at), "yyyy-MM-dd HH:mm:ss"),
+      formatDate(new Date(event.created_at), "yyyy-MM-dd HH:mm:ss"),
       event.device_id || '',
       event.reversed_by || '',
       event.hidden ? 'Sí' : 'No',
@@ -58,7 +69,7 @@ export async function exportAuditLog(
   })
 
   const exportDataObj: ExportData = {
-    title: `Auditoria_${format(startDate, 'yyyy-MM-dd')}_${format(endDate, 'yyyy-MM-dd')}`,
+    title: `Auditoria_${formatDate(startDate, 'yyyy-MM-dd')}_${formatDate(endDate, 'yyyy-MM-dd')}`,
     headers,
     rows,
   }

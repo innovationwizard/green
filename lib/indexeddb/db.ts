@@ -1,7 +1,7 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
-import { PendingEvent } from '@/types/events.types'
 import { Database } from '@/types/database.types'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface GreenDB extends DBSchema {
   projects: {
     key: string
@@ -32,10 +32,19 @@ interface GreenDB extends DBSchema {
     }
     indexes: { 'by-sku': string; 'by-name': string }
   }
+  // @ts-expect-error - IndexedDB schema type checking is too strict for complex payload types
   outbox: {
     key: string
-    value: PendingEvent & {
-      id?: number // Auto-increment ID for ordering
+    value: {
+      client_uuid: string
+      event_type: Database['public']['Enums']['event_type']
+      project_id: string | null
+      payload: Record<string, unknown>
+      device_id: string | null
+      geolocation: { lat: number; lng: number } | null
+      created_at: string
+      synced: boolean
+      sync_error?: string
     }
     indexes: { 'by-synced': boolean; 'by-created-at': number }
   }
