@@ -73,9 +73,21 @@ export default function NuevoEventoPage() {
       switch (eventType) {
         case 'MATERIAL_ADDED': {
           const source = formData.get('source') as MaterialSource
-          const itemLines = JSON.parse(formData.get('itemLines') as string || '[]')
+          const itemLines = JSON.parse(formData.get('itemLines') as string || '[]') as Array<{
+            item_id: string
+            quantity: number
+            unit_cost: number
+          }>
           
-          const payload: any = {
+          const payload: {
+            source: MaterialSource
+            items: Array<{ item_id: string; quantity: number; unit_cost: number }>
+            vendor?: string
+            payment_method?: PaymentMethod
+            warehouse_id?: string
+            issuer?: string
+            from_project_id?: string
+          } = {
             source,
             items: itemLines,
           }

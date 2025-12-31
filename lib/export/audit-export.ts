@@ -38,20 +38,24 @@ export async function exportAuditLog(
     'Razón',
   ]
 
-  const rows = (events || []).map((event) => [
-    event.id,
-    event.client_uuid,
-    event.event_type,
-    (event.project as any)?.human_id || '',
-    (event.created_by_user as any)?.full_name || (event.created_by_user as any)?.email || '',
-    format(new Date(event.created_at), "yyyy-MM-dd HH:mm:ss", { locale: es }),
-    event.device_id || '',
-    event.reversed_by || '',
-    event.hidden ? 'Sí' : 'No',
-    event.duplicate_flag ? 'Sí' : 'No',
-    JSON.stringify(event.payload),
-    event.reason || '',
-  ])
+  const rows = (events || []).map((event) => {
+    const project = event.project as { human_id?: string } | null
+    const user = event.created_by_user as { full_name?: string; email?: string } | null
+    return [
+      event.id,
+      event.client_uuid,
+      event.event_type,
+      project?.human_id || '',
+      user?.full_name || user?.email || '',
+      format(new Date(event.created_at), "yyyy-MM-dd HH:mm:ss"),
+      event.device_id || '',
+      event.reversed_by || '',
+      event.hidden ? 'Sí' : 'No',
+      event.duplicate_flag ? 'Sí' : 'No',
+      JSON.stringify(event.payload),
+      event.reason || '',
+    ]
+  })
 
   const exportDataObj: ExportData = {
     title: `Auditoria_${format(startDate, 'yyyy-MM-dd')}_${format(endDate, 'yyyy-MM-dd')}`,

@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { AlertTriangle } from 'lucide-react'
+import { ExceptionEvent, OmissionWarning } from '@/types/dashboard.types'
 
 export default function ExceptionsPage() {
-  const [duplicates, setDuplicates] = useState<any[]>([])
-  const [omissionWarnings, setOmissionWarnings] = useState<any[]>([])
+  const [duplicates, setDuplicates] = useState<ExceptionEvent[]>([])
+  const [omissionWarnings, setOmissionWarnings] = useState<OmissionWarning[]>([])
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
@@ -89,10 +90,10 @@ export default function ExceptionsPage() {
                       {event.event_type.replace(/_/g, ' ')}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Proyecto: {(event.project as any)?.human_id || 'N/A'}
+                      Proyecto: {event.project?.human_id || 'N/A'}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Creado por: {(event.created_by_user as any)?.full_name || (event.created_by_user as any)?.email || 'N/A'}
+                      Creado por: {event.created_by_user?.full_name || event.created_by_user?.email || 'N/A'}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {format(new Date(event.created_at), "d 'de' MMM 'a las' HH:mm", {

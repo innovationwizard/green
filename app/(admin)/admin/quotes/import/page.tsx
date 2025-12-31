@@ -12,7 +12,7 @@ export default function ImportQuotePage() {
   const router = useRouter()
   const supabase = createClient()
   const [projectId, setProjectId] = useState<string>('')
-  const [projects, setProjects] = useState<any[]>([])
+  const [projects, setProjects] = useState<Array<{ id: string; human_id: string; installation_address: string }>>([])
   const [parsedQuote, setParsedQuote] = useState<ParsedQuote | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

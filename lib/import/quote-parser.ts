@@ -58,7 +58,27 @@ export async function parseXLSXQuote(file: File): Promise<ParsedQuote> {
   })
 }
 
-function parseQuoteData(data: any[]): ParsedQuote {
+interface QuoteDataRow {
+  Producto?: string
+  'Producto/Código'?: string
+  Item?: string
+  product_name?: string
+  Cantidad?: string | number
+  Qty?: string | number
+  quantity?: string | number
+  'Precio Unitario'?: string | number
+  'Unit Price'?: string | number
+  unit_price?: string | number
+  Total?: string | number
+  Amount?: string | number
+  total?: string | number
+  Descripción?: string
+  Description?: string
+  Notes?: string
+  description?: string
+}
+
+function parseQuoteData(data: QuoteDataRow[]): ParsedQuote {
   let quoted_revenue = 0
   let quoted_materials = 0
   let quoted_labor = 0

@@ -4,16 +4,12 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { RefreshCw, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { ProjectionResult } from '@/types/dashboard.types'
 
 export default function ProjectionsPage() {
   const [running, setRunning] = useState(false)
   const [lastRun, setLastRun] = useState<Date | null>(null)
-  const [result, setResult] = useState<{
-    success: boolean
-    message?: string
-    processed?: { start_date: string; end_date: string }
-    errors?: any
-  } | null>(null)
+  const [result, setResult] = useState<ProjectionResult | null>(null)
 
   async function handleRunProjections() {
     setRunning(true)

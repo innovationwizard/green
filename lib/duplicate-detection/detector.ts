@@ -1,12 +1,13 @@
 import { createClient } from '@/lib/supabase/client'
-import { PendingEvent } from '@/types/events.types'
+import { PendingEvent, EventPayload } from '@/types/events.types'
+import { EventType } from '@/types/database.types'
 
 export interface DuplicateCheckResult {
   isDuplicate: boolean
   similarEvents: Array<{
     id: string
     created_at: string
-    payload: any
+    payload: EventPayload<EventType>
   }>
 }
 
@@ -41,19 +42,20 @@ export async function checkDuplicateEvent(
 
   // For material events, compare item lines
   if (event.event_type === 'MATERIAL_ADDED' && 'items' in event.payload) {
-    const eventItems = (event.payload as any).items || []
+    const materialPayload = event.payload as { items?: Array<{ item_id: string; quantity: number }> }
+    const eventItems = materialPayload.items || []
     const eventItemsKey = eventItems
-      .map((item: any) => `${item.item_id}:${item.quantity}`)
+      .map((item) => `${item.item_id}:${item.quantity}`)
       .sort()
       .join('|')
 
     const similarEvents = sameDayEvents.filter((existingEvent) => {
-      const existingPayload = existingEvent.payload as any
+      const existingPayload = existingEvent.payload as { items?: Array<{ item_id: string; quantity: number }> }
       if (!existingPayload.items) return false
 
       const existingItems = existingPayload.items || []
       const existingItemsKey = existingItems
-        .map((item: any) => `${item.item_id}:${item.quantity}`)
+        .map((item) => `${item.item_id}:${item.quantity}`)
         .sort()
         .join('|')
 
@@ -121,10 +123,10 @@ export async function flagDuplicateEvents(): Promise<void> {
     // For material events, compare item lines
     if (events[0].event_type === 'MATERIAL_ADDED') {
       const itemSignatures = events.map((e) => {
-        const payload = e.payload as any
+        const payload = e.payload as { items?: Array<{ item_id: string; quantity: number }> }
         const items = payload.items || []
         return items
-          .map((item: any) => `${item.item_id}:${item.quantity}`)
+          .map((item) => `${item.item_id}:${item.quantity}`)
           .sort()
           .join('|')
       })

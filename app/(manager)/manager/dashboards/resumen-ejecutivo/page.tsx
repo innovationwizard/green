@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { subDays, format } from 'date-fns'
+import { DashboardKPIData } from '@/types/dashboard.types'
 
 export default function ManagerResumenEjecutivoPage() {
   const [dateRange, setDateRange] = useState({
     start: format(subDays(new Date(), 30), 'yyyy-MM-dd'),
     end: format(new Date(), 'yyyy-MM-dd'),
   })
-  const [data, setData] = useState<any>(null)
+  const [data, setData] = useState<DashboardKPIData | null>(null)
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
