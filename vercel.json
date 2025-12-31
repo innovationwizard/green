@@ -1,0 +1,9 @@
+{
+  "crons": [
+    {
+      "path": "/api/projections/update",
+      "schedule": "*/15 * * * *"
+    }
+  ]
+}
+
