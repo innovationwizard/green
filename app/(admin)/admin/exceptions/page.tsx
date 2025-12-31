@@ -8,9 +8,6 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { AlertTriangle } from 'lucide-react'
 import { ExceptionEvent, OmissionWarning } from '@/types/dashboard.types'
-import { Database } from '@/types/database.types'
-
-type EventsUpdate = Database['public']['Tables']['events']['Update']
 
 export default function ExceptionsPage() {
   const [duplicates, setDuplicates] = useState<ExceptionEvent[]>([])
@@ -52,9 +49,9 @@ export default function ExceptionsPage() {
 
   async function handleResolveDuplicate(eventId: string) {
     // TypeScript has issues inferring the update type, so we use a type assertion
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await supabase
       .from('events')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .update({ duplicate_flag: false } as any)
       .eq('id', eventId)
 
