@@ -49,7 +49,7 @@ export default function ExceptionsPage() {
 
   async function handleResolveDuplicate(eventId: string) {
     // TypeScript has issues inferring the update type
-    // @ts-expect-error - Supabase type inference fails for update operations
+    // @ts-ignore - Supabase type inference fails for update operations
     const { error } = await supabase
       .from('events')
       .update({ duplicate_flag: false })
