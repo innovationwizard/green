@@ -27,16 +27,38 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- Fix RLS policy for users table to allow users to see themselves
--- The previous policy had a circular dependency issue
+-- The previous policy had a circular dependency issue causing infinite recursion
+-- Solution: Use a SECURITY DEFINER function to check role without triggering RLS
+
+-- Create a function to check if current user is admin/developer
+-- SECURITY DEFINER allows it to bypass RLS when checking roles
+CREATE OR REPLACE FUNCTION public.is_admin_or_developer()
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+STABLE
+AS $$
+DECLARE
+  user_role user_role;
+BEGIN
+  SELECT role INTO user_role
+  FROM public.users
+  WHERE id = auth.uid();
+  
+  RETURN user_role IN ('admin', 'developer');
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    RETURN FALSE;
+END;
+$$;
+
+-- Drop the problematic policy
 DROP POLICY IF EXISTS "Users can view own profile" ON public.users;
+
+-- Create new policy using the function (no recursion)
 CREATE POLICY "Users can view own profile" ON public.users
   FOR SELECT USING (
-    auth.uid() = id OR
-    EXISTS (
-      SELECT 1 FROM public.users u
-      WHERE u.id = auth.uid()
-      AND u.role IN ('admin', 'developer')
-    )
+    auth.uid() = id OR public.is_admin_or_developer()
   );
 
 -- Allow users to insert their own profile (for the trigger function)
@@ -46,26 +68,16 @@ CREATE POLICY "Users can insert own profile" ON public.users
   FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- Allow admins and developers to insert users (for manual user creation)
+-- Use the function to avoid recursion
 DROP POLICY IF EXISTS "Admins can insert users" ON public.users;
 CREATE POLICY "Admins can insert users" ON public.users
-  FOR INSERT WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.users u
-      WHERE u.id = auth.uid()
-      AND u.role IN ('admin', 'developer')
-    )
-  );
+  FOR INSERT WITH CHECK (public.is_admin_or_developer());
 
 -- Allow admins and developers to update users
+-- Use the function to avoid recursion
 DROP POLICY IF EXISTS "Admins can update users" ON public.users;
 CREATE POLICY "Admins can update users" ON public.users
-  FOR UPDATE USING (
-    EXISTS (
-      SELECT 1 FROM public.users u
-      WHERE u.id = auth.uid()
-      AND u.role IN ('admin', 'developer')
-    )
-  );
+  FOR UPDATE USING (public.is_admin_or_developer());
 
 -- Note: For existing users that were created manually in auth.users but don't have
 -- a corresponding row in public.users, they need to be created manually:
