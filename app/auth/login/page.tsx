@@ -58,14 +58,38 @@ function LoginForm() {
           .single()
 
         // Check if user exists in public.users table
-        if (userDataError || !userData) {
-          // User exists in auth.users but not in public.users
-          // This happens when a user is created in Supabase Auth but the corresponding
-          // row in public.users was not created (manual creation or trigger missing)
-          console.error('User not found in public.users:', {
+        if (userDataError) {
+          // Error querying the database - could be RLS policy issue or other database error
+          console.error('Error querying public.users:', {
             userId: data.user.id,
             email: data.user.email,
             error: userDataError,
+            errorCode: userDataError.code,
+            errorMessage: userDataError.message,
+            errorDetails: userDataError.details,
+            errorHint: userDataError.hint,
+          })
+          
+          // Provide more specific error message based on error code
+          let errorMessage = 'Error: No se pudo acceder a la información de tu cuenta. '
+          if (userDataError.code === 'PGRST116' || userDataError.message?.includes('No rows')) {
+            errorMessage += 'Tu cuenta no está completamente configurada. Por favor, contacte al administrador.'
+          } else if (userDataError.code === '42501' || userDataError.message?.includes('permission')) {
+            errorMessage += 'Error de permisos. Por favor, contacte al administrador.'
+          } else {
+            errorMessage += `Error técnico: ${userDataError.message || 'Error desconocido'}. Contacte al administrador.`
+          }
+          
+          setError(errorMessage + ` (Usuario: ${data.user.email})`)
+          setLoading(false)
+          return
+        }
+        
+        if (!userData) {
+          // User exists in auth.users but not in public.users
+          console.error('User not found in public.users:', {
+            userId: data.user.id,
+            email: data.user.email,
           })
           setError(
             'Error: Tu cuenta no está completamente configurada. ' +
