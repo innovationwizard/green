@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database.types'
 
@@ -17,7 +17,24 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  // Check for error query parameter
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam === 'user_not_configured') {
+      setError(
+        'Tu cuenta no está completamente configurada. ' +
+        'Por favor, contacte al administrador para completar la configuración de tu cuenta.'
+      )
+    } else if (errorParam === 'role_not_found') {
+      setError(
+        'No se pudo determinar el rol del usuario. ' +
+        'Por favor, contacte al administrador para asignar un rol a tu cuenta.'
+      )
+    }
+  }, [searchParams])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,11 +51,30 @@ export default function LoginPage() {
 
       if (data.user) {
         // Get user data including password reset requirement
-        const { data: userData } = await supabase
+        const { data: userData, error: userDataError } = await supabase
           .from('users')
           .select('role, must_change_password')
           .eq('id', data.user.id)
           .single()
+
+        // Check if user exists in public.users table
+        if (userDataError || !userData) {
+          // User exists in auth.users but not in public.users
+          // This happens when a user is created in Supabase Auth but the corresponding
+          // row in public.users was not created (manual creation or trigger missing)
+          console.error('User not found in public.users:', {
+            userId: data.user.id,
+            email: data.user.email,
+            error: userDataError,
+          })
+          setError(
+            'Error: Tu cuenta no está completamente configurada. ' +
+            'Por favor, contacte al administrador para completar la configuración de tu cuenta. ' +
+            `(Usuario autenticado: ${data.user.email}, pero no encontrado en la base de datos)`
+          )
+          setLoading(false)
+          return
+        }
 
         const userDataTyped = userData as Pick<UserRow, 'role' | 'must_change_password'> | null
         
@@ -48,7 +84,16 @@ export default function LoginPage() {
         
         if (!role) {
           // Role lookup failed - this is an error condition
-          setError('Error: No se pudo determinar el rol del usuario. Contacte al administrador.')
+          console.error('User role is null:', {
+            userId: data.user.id,
+            email: data.user.email,
+            userData: userDataTyped,
+          })
+          setError(
+            'Error: No se pudo determinar el rol del usuario. ' +
+            'Por favor, contacte al administrador para asignar un rol a tu cuenta. ' +
+            `(Usuario: ${data.user.email})`
+          )
           setLoading(false)
           return
         }

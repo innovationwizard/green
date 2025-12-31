@@ -13,11 +13,23 @@ export default async function HomePage() {
   }
   
   // Get user role and password reset requirement
-  const { data: userData } = await supabase
+  const { data: userData, error: userDataError } = await supabase
     .from('users')
     .select('role, must_change_password')
     .eq('id', user.id)
     .single()
+
+  // Check if user exists in public.users table
+  if (userDataError || !userData) {
+    // User exists in auth.users but not in public.users
+    // Redirect to login with error message
+    console.error('User not found in public.users:', {
+      userId: user.id,
+      email: user.email,
+      error: userDataError,
+    })
+    redirect('/auth/login?error=user_not_configured')
+  }
 
   const userDataTyped = userData as Pick<UserRow, 'role' | 'must_change_password'> | null
   
@@ -32,8 +44,12 @@ export default async function HomePage() {
   
   if (!role) {
     // Role lookup failed - this is an error condition, not a default to installer
-    console.error('User role not found for user:', user.id)
-    redirect('/auth/login')
+    console.error('User role is null:', {
+      userId: user.id,
+      email: user.email,
+      userData: userDataTyped,
+    })
+    redirect('/auth/login?error=role_not_found')
   }
   
   // Redirect based on role
