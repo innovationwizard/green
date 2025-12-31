@@ -57,8 +57,14 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Check if user needs to change password (except on reset password page and login page)
-  if (user && !request.nextUrl.pathname.startsWith('/auth/reset-password') && !request.nextUrl.pathname.startsWith('/auth/login')) {
+  // Check if user needs to change password (except on auth pages)
+  if (
+    user && 
+    !request.nextUrl.pathname.startsWith('/auth/reset-password') && 
+    !request.nextUrl.pathname.startsWith('/auth/reset-password-confirm') &&
+    !request.nextUrl.pathname.startsWith('/auth/forgot-password') &&
+    !request.nextUrl.pathname.startsWith('/auth/login')
+  ) {
     const { data: userData } = await supabase
       .from('users')
       .select('must_change_password')
