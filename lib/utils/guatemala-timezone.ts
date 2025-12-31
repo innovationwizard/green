@@ -2,10 +2,16 @@
 const GUATEMALA_TZ = 'America/Guatemala'
 
 /**
- * Get current time in Guatemala timezone
+ * Get date components in Guatemala timezone
  */
-export function getGuatemalaTime(date: Date = new Date()): Date {
-  // Format date in Guatemala timezone and parse it back
+function getGuatemalaDateComponents(date: Date): {
+  year: number
+  month: number
+  day: number
+  hour: number
+  minute: number
+  second: number
+} {
   const formatter = new Intl.DateTimeFormat('en-US', {
     timeZone: GUATEMALA_TZ,
     year: 'numeric',
@@ -18,56 +24,52 @@ export function getGuatemalaTime(date: Date = new Date()): Date {
   })
   
   const parts = formatter.formatToParts(date)
-  const year = parseInt(parts.find(p => p.type === 'year')!.value)
-  const month = parseInt(parts.find(p => p.type === 'month')!.value) - 1
-  const day = parseInt(parts.find(p => p.type === 'day')!.value)
-  const hour = parseInt(parts.find(p => p.type === 'hour')!.value)
-  const minute = parseInt(parts.find(p => p.type === 'minute')!.value)
-  const second = parseInt(parts.find(p => p.type === 'second')!.value)
-  
-  return new Date(Date.UTC(year, month, day, hour, minute, second))
+  return {
+    year: parseInt(parts.find(p => p.type === 'year')!.value),
+    month: parseInt(parts.find(p => p.type === 'month')!.value) - 1,
+    day: parseInt(parts.find(p => p.type === 'day')!.value),
+    hour: parseInt(parts.find(p => p.type === 'hour')!.value),
+    minute: parseInt(parts.find(p => p.type === 'minute')!.value),
+    second: parseInt(parts.find(p => p.type === 'second')!.value),
+  }
 }
 
 /**
- * Convert a date/time in Guatemala timezone to UTC
+ * Get current time in Guatemala timezone (as Date object)
  */
-function guatemalaToUTC(year: number, month: number, day: number, hour: number, minute: number, second: number): Date {
-  // Create a date string in Guatemala timezone format
-  const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`
-  
-  // Use Intl.DateTimeFormat to get the UTC equivalent
-  const tempDate = new Date(dateStr)
-  const guatemalaOffset = getTimezoneOffset(GUATEMALA_TZ, tempDate)
-  const utcDate = new Date(tempDate.getTime() - guatemalaOffset * 60000)
-  
-  return utcDate
+export function getGuatemalaTime(date: Date = new Date()): Date {
+  const components = getGuatemalaDateComponents(date)
+  // Create a date string and parse it as if it were UTC, then adjust
+  const dateStr = `${components.year}-${String(components.month + 1).padStart(2, '0')}-${String(components.day).padStart(2, '0')}T${String(components.hour).padStart(2, '0')}:${String(components.minute).padStart(2, '0')}:${String(components.second).padStart(2, '0')}Z`
+  return new Date(dateStr)
 }
 
 /**
- * Get timezone offset in minutes for a given timezone at a specific date
- */
-function getTimezoneOffset(timeZone: string, date: Date): number {
-  const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }))
-  const tzDate = new Date(date.toLocaleString('en-US', { timeZone }))
-  return (tzDate.getTime() - utcDate.getTime()) / 60000
-}
-
-/**
- * Get next Saturday 23:59:59 in Guatemala timezone (as UTC Date)
+ * Get next Saturday 23:59:59 in Guatemala timezone (as UTC Date for comparison)
  */
 export function getNextSaturday23_59(): Date {
   const now = new Date()
+  const guatemalaComponents = getGuatemalaDateComponents(now)
   
-  // Get current time in Guatemala
-  const guatemalaNow = getGuatemalaTime(now)
+  // Create a date object representing current Guatemala time
+  const guatemalaDate = new Date(
+    Date.UTC(
+      guatemalaComponents.year,
+      guatemalaComponents.month,
+      guatemalaComponents.day,
+      guatemalaComponents.hour,
+      guatemalaComponents.minute,
+      guatemalaComponents.second
+    )
+  )
   
   // Get day of week (0 = Sunday, 6 = Saturday)
-  const dayOfWeek = guatemalaNow.getUTCDay()
+  const dayOfWeek = guatemalaDate.getUTCDay()
   const daysUntilSaturday = dayOfWeek === 6 ? 7 : (6 - dayOfWeek)
   
-  // Calculate next Saturday
-  const nextSaturday = new Date(guatemalaNow)
-  nextSaturday.setUTCDate(guatemalaNow.getUTCDate() + daysUntilSaturday)
+  // Calculate next Saturday 23:59:59
+  const nextSaturday = new Date(guatemalaDate)
+  nextSaturday.setUTCDate(guatemalaDate.getUTCDate() + daysUntilSaturday)
   nextSaturday.setUTCHours(23, 59, 59, 999)
   
   return nextSaturday
@@ -79,10 +81,19 @@ export function getNextSaturday23_59(): Date {
 export function canAnularEvent(eventDate: Date): boolean {
   const deadline = getNextSaturday23_59()
   
-  // Convert event date to Guatemala timezone for comparison
-  const eventDateGuatemala = getGuatemalaTime(eventDate)
-  const deadlineGuatemala = getGuatemalaTime(deadline)
+  // Get event date components in Guatemala timezone
+  const eventComponents = getGuatemalaDateComponents(eventDate)
+  const eventGuatemalaDate = new Date(
+    Date.UTC(
+      eventComponents.year,
+      eventComponents.month,
+      eventComponents.day,
+      eventComponents.hour,
+      eventComponents.minute,
+      eventComponents.second
+    )
+  )
   
-  return eventDateGuatemala <= deadlineGuatemala
+  return eventGuatemalaDate <= deadline
 }
 
