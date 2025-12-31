@@ -55,6 +55,54 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  /* Mobile-first responsive utilities */
+  .container-mobile {
+    @apply px-4 mx-auto max-w-full;
+  }
+  
+  .container-tablet {
+    @apply md:px-6 md:max-w-2xl;
+  }
+  
+  .container-desktop {
+    @apply lg:px-8 lg:max-w-6xl;
+  }
+  
+  /* Touch-friendly tap targets */
+  .tap-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Safe area insets for mobile */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Scrollable containers */
+  .scroll-container {
+    @apply overflow-y-auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
 
