@@ -16,7 +16,8 @@ import {
   AlertTriangle,
   Upload,
   Download,
-  Settings
+  Settings,
+  Users
 } from 'lucide-react'
 
 interface AdminWorkMetrics {
@@ -135,6 +136,12 @@ export default function DashboardsPage() {
   ]
 
   const quickActions = [
+    {
+      href: '/admin/users',
+      title: 'Gestión de Usuarios',
+      description: 'Crear, editar y administrar usuarios',
+      icon: Users,
+    },
     {
       href: '/admin/exceptions',
       title: 'Centro de Excepciones',
