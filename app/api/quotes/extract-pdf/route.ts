@@ -37,8 +37,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Convert File to Buffer for pdf-parse
+    // Note: pdf-parse dependency may show Buffer() deprecation warnings internally
+    // This is a known issue in the dependency and doesn't affect functionality
     const arrayBuffer = await file.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
+    const buffer = Buffer.from(arrayBuffer) // Using modern Buffer.from() API
 
     // Extract text from PDF
     const pdfData = await pdfParse(buffer)
