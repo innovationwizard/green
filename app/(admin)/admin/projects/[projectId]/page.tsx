@@ -167,6 +167,7 @@ export default async function ProjectPage({ params }: Params) {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
+                    timeZone: 'America/Guatemala',
                   })}
                 </p>
               </div>
@@ -182,6 +183,7 @@ export default async function ProjectPage({ params }: Params) {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
+                    timeZone: 'America/Guatemala',
                   })}
                 </p>
               </div>
@@ -189,7 +191,15 @@ export default async function ProjectPage({ params }: Params) {
             <div>
               <label className="text-sm font-medium text-muted-foreground">Creado</label>
               <p className="text-sm text-muted-foreground">
-                {new Date(project.created_at).toLocaleString('es-GT')}
+                {new Date(project.created_at).toLocaleString('es-GT', {
+                  timeZone: 'America/Guatemala',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true,
+                })}
               </p>
             </div>
           </CardContent>
@@ -218,7 +228,12 @@ export default async function ProjectPage({ params }: Params) {
                           Q {quote.quoted_revenue.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(quote.created_at).toLocaleDateString('es-GT')}
+                          {new Date(quote.created_at).toLocaleDateString('es-GT', {
+                            timeZone: 'America/Guatemala',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
                         </p>
                       </div>
                     </div>
