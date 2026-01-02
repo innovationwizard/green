@@ -5,9 +5,15 @@ const withPWA = require('next-pwa')({
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
   buildExcludes: [/middleware-manifest\.json$/, /app-build-manifest\.json$/],
-  exclude: [
-    // Exclude app-build-manifest.json (doesn't exist in Next.js 14 App Router)
-    ({ url }) => url?.pathname?.includes('/_next/app-build-manifest.json') || false,
+  // Filter out app-build-manifest.json from precache (doesn't exist in Next.js 14 App Router)
+  manifestTransforms: [
+    async (manifestEntries) => {
+      // Remove app-build-manifest.json from precache entries
+      const manifest = manifestEntries.filter(
+        (entry) => !entry.url.includes('/_next/app-build-manifest.json')
+      )
+      return { manifest, warnings: [] }
+    },
   ],
   runtimeCaching: [
     {
