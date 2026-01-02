@@ -119,8 +119,12 @@ export function ServiceWorkerHandler() {
         window.location.reload()
       })
 
-      // Listen for fetch errors (404s) and clear caches if needed
-      // This catches both script/link errors and fetch API errors
+      // Listen for fetch errors (404s) and handle gracefully
+      // Ignore known non-existent files that workbox tries to precache
+      const knownNonExistentFiles = [
+        '/_next/app-build-manifest.json', // Doesn't exist in Next.js 14 App Router
+      ]
+
       const handleError = (event: ErrorEvent | Event) => {
         const target = event.target as HTMLElement | null
         let errorSource: string | null = null
@@ -128,11 +132,29 @@ export function ServiceWorkerHandler() {
         if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
           errorSource = (target as HTMLScriptElement).src || (target as HTMLLinkElement).href || null
         } else if (event instanceof ErrorEvent) {
-          // Check error message for UUID pattern
+          // Check error message for UUID pattern or file paths
           const message = event.message || ''
           const uuidMatch = message.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)
           if (uuidMatch) {
             errorSource = uuidMatch[0]
+          }
+        }
+
+        // Check if it's a known non-existent file (ignore these)
+        if (errorSource) {
+          try {
+            const url = new URL(errorSource, window.location.origin)
+            if (knownNonExistentFiles.some(file => url.pathname.includes(file))) {
+              // Silently ignore known non-existent files
+              console.debug('Ignoring 404 for known non-existent file:', url.pathname)
+              return
+            }
+          } catch {
+            // If URL parsing fails, check if errorSource contains the file path
+            if (knownNonExistentFiles.some(file => errorSource?.includes(file))) {
+              console.debug('Ignoring 404 for known non-existent file')
+              return
+            }
           }
         }
 
@@ -160,6 +182,12 @@ export function ServiceWorkerHandler() {
       // Also listen for unhandled promise rejections (fetch errors)
       window.addEventListener('unhandledrejection', (event) => {
         const reason = event.reason?.toString() || ''
+        // Check for known non-existent files first
+        if (knownNonExistentFiles.some(file => reason.includes(file))) {
+          console.debug('Ignoring rejection for known non-existent file')
+          event.preventDefault() // Prevent error from being logged
+          return
+        }
         if (reason.includes('404') && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(reason)) {
           console.warn('Detected 404 rejection for precached resource')
           handleError(event as unknown as ErrorEvent)

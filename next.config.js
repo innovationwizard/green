@@ -4,7 +4,11 @@ const withPWA = require('next-pwa')({
   register: false, // We'll register manually in ServiceWorkerHandler for better error handling
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
-  buildExcludes: [/middleware-manifest\.json$/],
+  buildExcludes: [/middleware-manifest\.json$/, /app-build-manifest\.json$/],
+  exclude: [
+    // Exclude app-build-manifest.json (doesn't exist in Next.js 14 App Router)
+    ({ url }) => url.pathname.includes('/_next/app-build-manifest.json'),
+  ],
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
