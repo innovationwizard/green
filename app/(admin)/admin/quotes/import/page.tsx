@@ -66,8 +66,8 @@ export default function ImportQuotePage() {
   }
 
   async function handleImport() {
-    if (!projectId || !parsedQuote) {
-      setError('Selecciona un proyecto y procesa un archivo primero')
+    if (!parsedQuote) {
+      setError('Procesa un archivo primero')
       return
     }
 
@@ -78,9 +78,78 @@ export default function ImportQuotePage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('No autenticado')
 
+      let finalProjectId = projectId
+
+      // If no project selected but we have client/address info, create project automatically
+      if (!finalProjectId && parsedQuote.client_name && parsedQuote.installation_address) {
+        // Find or create client
+        let clientId: string
+        
+        // Check if client exists
+        const { data: existingClient } = await supabase
+          .from('clients')
+          .select('id')
+          .ilike('name', parsedQuote.client_name)
+          .limit(1)
+          .single()
+
+        if (existingClient) {
+          clientId = existingClient.id
+        } else {
+          // Create new client
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - Supabase type inference fails for insert operations
+          const { data: newClient, error: clientError } = await supabase
+            .from('clients')
+            .insert({
+              name: parsedQuote.client_name,
+              created_by: user.id,
+            })
+            .select()
+            .single()
+
+          if (clientError || !newClient) {
+            throw new Error(`Error al crear cliente: ${clientError?.message || 'Error desconocido'}`)
+          }
+          clientId = newClient.id
+        }
+
+        // Generate project human_id from client name
+        const projectHumanId = parsedQuote.client_name
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, '')
+          .substring(0, 20) || 'PROY-' + Date.now().toString().slice(-6)
+
+        // Create new project
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - Supabase type inference fails for insert operations
+        const { data: newProject, error: projectError } = await supabase
+          .from('projects')
+          .insert({
+            human_id: projectHumanId,
+            client_id: clientId,
+            installation_address: parsedQuote.installation_address,
+            project_type: parsedQuote.project_type || 'residential',
+            size_kw: parsedQuote.system_size_kw || null,
+            price: parsedQuote.quoted_revenue || null,
+            status: 'CREATED',
+            created_by: user.id,
+          })
+          .select()
+          .single()
+
+        if (projectError || !newProject) {
+          throw new Error(`Error al crear proyecto: ${projectError?.message || 'Error desconocido'}`)
+        }
+        finalProjectId = newProject.id
+        setProjectId(finalProjectId)
+      } else if (!finalProjectId) {
+        throw new Error('Selecciona un proyecto o asegúrate de que el PDF contenga información del cliente y dirección de instalación')
+      }
+
       // Create quote header
       const insertData: QuoteInsert = {
-        project_id: projectId,
+        project_id: finalProjectId,
         quoted_revenue: parsedQuote.quoted_revenue,
         quoted_materials: parsedQuote.quoted_materials,
         quoted_labor: parsedQuote.quoted_labor,
@@ -124,7 +193,7 @@ export default function ImportQuotePage() {
       }
 
       alert('Cotización importada exitosamente')
-      router.push(`/admin/projects/${projectId}`)
+      router.push(`/admin/projects/${finalProjectId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al importar cotización')
     } finally {
@@ -188,6 +257,20 @@ export default function ImportQuotePage() {
               <div className="p-4 bg-green-50 border border-green-200 rounded">
                 <h3 className="font-semibold mb-2">Vista Previa de Cotización</h3>
                 <div className="space-y-1 text-sm">
+                  {(parsedQuote.client_name || parsedQuote.installation_address) && (
+                    <div className="mb-3 p-2 bg-white rounded border">
+                      <div className="font-medium text-xs text-gray-600 mb-1">Información del Proyecto:</div>
+                      {parsedQuote.client_name && (
+                        <div><strong>Cliente:</strong> {parsedQuote.client_name}</div>
+                      )}
+                      {parsedQuote.installation_address && (
+                        <div><strong>Dirección:</strong> {parsedQuote.installation_address}</div>
+                      )}
+                      {parsedQuote.project_type && (
+                        <div><strong>Tipo:</strong> {parsedQuote.project_type === 'residential' ? 'Residencial' : 'Comercial'}</div>
+                      )}
+                    </div>
+                  )}
                   <div>Ingresos Totales: Q {parsedQuote.quoted_revenue.toFixed(2)}</div>
                   {parsedQuote.quoted_materials && (
                     <div>Materiales: Q {parsedQuote.quoted_materials.toFixed(2)}</div>
@@ -214,9 +297,19 @@ export default function ImportQuotePage() {
                 </div>
               </div>
 
+              {!projectId && parsedQuote.client_name && parsedQuote.installation_address && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded text-blue-800 text-sm mb-2">
+                  ℹ️ Se creará automáticamente un proyecto para: <strong>{parsedQuote.client_name}</strong> en <strong>{parsedQuote.installation_address}</strong>
+                </div>
+              )}
+              {!projectId && (!parsedQuote.client_name || !parsedQuote.installation_address) && (
+                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm mb-2">
+                  ⚠️ Selecciona un proyecto o asegúrate de que el PDF contenga información del cliente y dirección de instalación.
+                </div>
+              )}
               <Button
                 onClick={handleImport}
-                disabled={loading || !projectId}
+                disabled={loading || !parsedQuote || (!projectId && (!parsedQuote.client_name || !parsedQuote.installation_address))}
                 className="w-full"
               >
                 {loading ? 'Importando...' : 'Importar Cotización'}

@@ -18,6 +18,10 @@ export interface ParsedQuote {
   system_size_kw?: number
   expected_duration_days?: number
   line_items: QuoteLineItem[]
+  // Project/client information extracted from quote
+  client_name?: string
+  installation_address?: string
+  project_type?: 'residential' | 'commercial'
 }
 
 export async function parseCSVQuote(file: File): Promise<ParsedQuote> {

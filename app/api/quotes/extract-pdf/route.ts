@@ -70,6 +70,9 @@ function parsePDFText(text: string) {
   let quoted_expenses: number | undefined
   let system_size_kw: number | undefined
   let expected_duration_days: number | undefined
+  let client_name: string | undefined
+  let installation_address: string | undefined
+  let project_type: 'residential' | 'commercial' | undefined
   const line_items: Array<{
     quote_product_name: string
     quantity: number
@@ -77,6 +80,57 @@ function parsePDFText(text: string) {
     total: number
     description?: string
   }> = []
+
+  // Extract client name and address from PDF header/title area (usually first 20 lines)
+  for (let i = 0; i < Math.min(20, lines.length); i++) {
+    const line = lines[i]
+    const upperLine = line.toUpperCase()
+    
+    // Look for client name patterns: "CLIENTE:", "CLIENT:", "PARA:", "PARA EL SEÑOR", etc.
+    if ((upperLine.includes('CLIENTE') || upperLine.includes('CLIENT') || 
+         upperLine.includes('PARA') || upperLine.includes('SEÑOR') || upperLine.includes('SEÑORA')) &&
+        !client_name && line.length > 5 && line.length < 100) {
+      // Extract name after colon or from next line
+      const colonIndex = line.indexOf(':')
+      if (colonIndex > -1) {
+        client_name = line.substring(colonIndex + 1).trim()
+      } else if (i + 1 < lines.length) {
+        client_name = lines[i + 1].trim()
+      }
+      // Clean up common prefixes
+      if (client_name) {
+        client_name = client_name.replace(/^(PARA|CLIENTE|CLIENT|SEÑOR|SEÑORA|SR\.|SRA\.|SR\.|SRA\.)\s*/i, '').trim()
+      }
+    }
+    
+    // Look for address patterns: "DIRECCIÓN:", "ADDRESS:", "INSTALACIÓN:", "UBICACIÓN:"
+    if ((upperLine.includes('DIRECCIÓN') || upperLine.includes('ADDRESS') || 
+         upperLine.includes('INSTALACIÓN') || upperLine.includes('UBICACIÓN') ||
+         upperLine.includes('LUGAR') || upperLine.includes('LOCATION')) &&
+        !installation_address) {
+      const colonIndex = line.indexOf(':')
+      if (colonIndex > -1) {
+        installation_address = line.substring(colonIndex + 1).trim()
+        // If address continues on next line, include it
+        if (i + 1 < lines.length && !lines[i + 1].toUpperCase().includes('TOTAL') && 
+            !lines[i + 1].toUpperCase().includes('PRECIO')) {
+          installation_address += ' ' + lines[i + 1].trim()
+        }
+      } else if (i + 1 < lines.length) {
+        installation_address = lines[i + 1].trim()
+        if (i + 2 < lines.length && !lines[i + 2].toUpperCase().includes('TOTAL')) {
+          installation_address += ' ' + lines[i + 2].trim()
+        }
+      }
+    }
+    
+    // Look for project type: "RESIDENCIAL", "COMERCIAL", "RESIDENTIAL", "COMMERCIAL"
+    if (upperLine.includes('RESIDENCIAL') || upperLine.includes('RESIDENTIAL')) {
+      project_type = 'residential'
+    } else if (upperLine.includes('COMERCIAL') || upperLine.includes('COMMERCIAL')) {
+      project_type = 'commercial'
+    }
+  }
 
   // Look for totals and summary information
   for (let i = 0; i < lines.length; i++) {
@@ -216,6 +270,9 @@ function parsePDFText(text: string) {
     system_size_kw,
     expected_duration_days,
     line_items,
+    client_name: client_name || undefined,
+    installation_address: installation_address || undefined,
+    project_type: project_type || undefined,
   }
 }
 
