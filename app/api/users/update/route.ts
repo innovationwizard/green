@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
+import { Database } from '@/types/database.types'
+
+type UserRow = Database['public']['Tables']['users']['Row']
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +19,7 @@ export async function POST(request: NextRequest) {
       .from('users')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .single() as { data: Pick<UserRow, 'role'> | null }
 
     if (!userData || (userData.role !== 'admin' && userData.role !== 'developer')) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
@@ -34,7 +37,7 @@ export async function POST(request: NextRequest) {
       .from('users')
       .select('email')
       .eq('id', id)
-      .single()
+      .single() as { data: Pick<UserRow, 'email'> | null }
 
     if (!currentUser) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
