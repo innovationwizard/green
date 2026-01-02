@@ -10,25 +10,45 @@ export function ServiceWorkerHandler() {
 
     // Handle service worker registration and updates
     if ('serviceWorker' in navigator) {
-      // First, check for and clear any stale caches that might cause 404 errors
-      const clearStaleCaches = async () => {
+      // Check for stale service worker and clear if needed
+      const checkAndCleanup = async () => {
         try {
-          const cacheNames = await caches.keys()
-          // Clear workbox precache caches that might be stale
-          const workboxCaches = cacheNames.filter((name) =>
-            name.startsWith('workbox-precache') || name.startsWith('precache-')
-          )
-          for (const cacheName of workboxCaches) {
-            await caches.delete(cacheName)
-            console.log('Cleared stale cache:', cacheName)
+          // Check if there's an active service worker
+          if (navigator.serviceWorker.controller) {
+            // Check if the service worker file exists and is current
+            try {
+              const response = await fetch('/sw.js', { cache: 'no-store' })
+              if (!response.ok) {
+                // Service worker file doesn't exist or is outdated, clear everything
+                console.log('Service worker file not found or outdated, clearing...')
+                const registrations = await navigator.serviceWorker.getRegistrations()
+                for (const registration of registrations) {
+                  await registration.unregister()
+                }
+                const cacheNames = await caches.keys()
+                for (const cacheName of cacheNames) {
+                  await caches.delete(cacheName)
+                }
+              }
+            } catch (error) {
+              // If we can't fetch the service worker, it might be stale
+              console.warn('Could not verify service worker, clearing stale caches...')
+              const cacheNames = await caches.keys()
+              const workboxCaches = cacheNames.filter((name) =>
+                name.startsWith('workbox-precache') || name.startsWith('precache-')
+              )
+              for (const cacheName of workboxCaches) {
+                await caches.delete(cacheName)
+              }
+            }
           }
         } catch (error) {
-          console.warn('Error clearing stale caches:', error)
+          console.warn('Error during cleanup check:', error)
         }
       }
 
-      // Clear stale caches before registering
-      clearStaleCaches().then(() => {
+      // Check and cleanup if needed, then register
+      checkAndCleanup().then(() => {
         navigator.serviceWorker
           .register('/sw.js')
           .then((registration) => {
@@ -100,29 +120,51 @@ export function ServiceWorkerHandler() {
       })
 
       // Listen for fetch errors (404s) and clear caches if needed
-      window.addEventListener('error', (event) => {
-        const target = event.target as HTMLElement
+      // This catches both script/link errors and fetch API errors
+      const handleError = (event: ErrorEvent | Event) => {
+        const target = event.target as HTMLElement | null
+        let errorSource: string | null = null
+
         if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
-          const src = (target as HTMLScriptElement).src || (target as HTMLLinkElement).href
-          // Check if it's a UUID-like resource (workbox precache entry)
-          if (src && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(src)) {
-            console.warn('Detected 404 for precached resource:', src)
-            // Clear caches and reload
-            navigator.serviceWorker.getRegistrations().then((registrations) => {
-              registrations.forEach((registration) => {
-                registration.unregister()
-              })
-              return caches.keys()
-            }).then((cacheNames) => {
-              cacheNames.forEach((cacheName) => {
-                caches.delete(cacheName)
-              })
-              console.log('Cleared caches due to 404 error, reloading...')
-              setTimeout(() => window.location.reload(), 1000)
-            })
+          errorSource = (target as HTMLScriptElement).src || (target as HTMLLinkElement).href || null
+        } else if (event instanceof ErrorEvent) {
+          // Check error message for UUID pattern
+          const message = event.message || ''
+          const uuidMatch = message.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)
+          if (uuidMatch) {
+            errorSource = uuidMatch[0]
           }
         }
-      }, true) // Use capture phase to catch errors early
+
+        // Check if it's a UUID-like resource (workbox precache entry)
+        if (errorSource && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(errorSource)) {
+          console.warn('Detected 404 for precached resource:', errorSource)
+          // Clear caches and reload
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            registrations.forEach((registration) => {
+              registration.unregister()
+            })
+            return caches.keys()
+          }).then((cacheNames) => {
+            cacheNames.forEach((cacheName) => {
+              caches.delete(cacheName)
+            })
+            console.log('Cleared caches due to 404 error, reloading...')
+            setTimeout(() => window.location.reload(), 1000)
+          })
+        }
+      }
+
+      window.addEventListener('error', handleError, true) // Use capture phase to catch errors early
+      
+      // Also listen for unhandled promise rejections (fetch errors)
+      window.addEventListener('unhandledrejection', (event) => {
+        const reason = event.reason?.toString() || ''
+        if (reason.includes('404') && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(reason)) {
+          console.warn('Detected 404 rejection for precached resource')
+          handleError(event as unknown as ErrorEvent)
+        }
+      })
     }
   }, [])
 
