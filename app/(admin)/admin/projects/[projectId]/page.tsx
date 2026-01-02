@@ -81,8 +81,10 @@ export default async function ProjectPage({ params }: Params) {
 
   const statusLabels: Record<ProjectRow['status'], string> = {
     CREATED: 'Creado',
+    SCHEDULED: 'Programado',
     IN_PROGRESS: 'En Progreso',
-    COMPLETED: 'Completado',
+    INSTALLED: 'Instalado',
+    CLOSED: 'Cerrado',
     CANCELLED: 'Cancelado',
   }
 
