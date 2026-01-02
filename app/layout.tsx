@@ -1,6 +1,7 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { ServiceWorkerHandler } from '@/components/shared/service-worker-handler'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -48,7 +49,6 @@ export const metadata: Metadata = {
   title: 'GREENTELLIGENCE',
   description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
   manifest: '/manifest.json',
-  themeColor: '#16a34a',
   icons: {
     // SVG favicon for modern browsers (scalable, crisp at any size)
     icon: [
@@ -83,16 +83,18 @@ export const metadata: Metadata = {
     description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
     images: [ogImageUrl],
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'GREENTELLIGENCE',
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#16a34a',
 }
 
 export default function RootLayout({
@@ -102,7 +104,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        <ServiceWorkerHandler />
+      </body>
     </html>
   )
 }

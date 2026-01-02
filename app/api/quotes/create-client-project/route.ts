@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
           created_by: user.id,
         } as never)
         .select()
-        .single() as { data: Pick<ClientRow, 'id'> | null; error: any }
+        .single() as { data: Pick<ClientRow, 'id'> | null; error: { message: string } | null }
 
       if (clientError || !newClient) {
         return NextResponse.json(
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         created_by: user.id,
       } as never)
       .select()
-      .single() as { data: Pick<ProjectRow, 'id'> | null; error: any }
+      .single() as { data: Pick<ProjectRow, 'id'> | null; error: { message: string } | null }
 
     if (projectError || !newProject) {
       return NextResponse.json(
