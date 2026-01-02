@@ -80,68 +80,27 @@ export default function ImportQuotePage() {
 
       let finalProjectId = projectId
 
-      // If no project selected but we have client/address info, create project automatically
+      // If no project selected but we have client/address info, create project automatically via API
       if (!finalProjectId && parsedQuote.client_name && parsedQuote.installation_address) {
-        // Find or create client
-        let clientId: string
-        
-        // Check if client exists
-        const { data: existingClient } = await supabase
-          .from('clients')
-          .select('id')
-          .ilike('name', parsedQuote.client_name)
-          .limit(1)
-          .single() as { data: { id: string } | null }
-
-        if (existingClient) {
-          clientId = existingClient.id
-        } else {
-          // Create new client
-          const { data: newClient, error: clientError } = await supabase
-            .from('clients')
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore - Supabase type inference fails for insert operations
-            .insert({
-              name: parsedQuote.client_name,
-              created_by: user.id,
-            } as never)
-            .select()
-            .single() as { data: { id: string } | null; error: any }
-
-          if (clientError || !newClient) {
-            throw new Error(`Error al crear cliente: ${clientError?.message || 'Error desconocido'}`)
-          }
-          clientId = newClient.id
-        }
-
-        // Generate project human_id from client name
-        const projectHumanId = parsedQuote.client_name
-          .toUpperCase()
-          .replace(/[^A-Z0-9]/g, '')
-          .substring(0, 20) || 'PROY-' + Date.now().toString().slice(-6)
-
-        // Create new project
-        const { data: newProject, error: projectError } = await supabase
-          .from('projects')
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore - Supabase type inference fails for insert operations
-          .insert({
-            human_id: projectHumanId,
-            client_id: clientId,
+        const createResponse = await fetch('/api/quotes/create-client-project', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client_name: parsedQuote.client_name,
             installation_address: parsedQuote.installation_address,
             project_type: parsedQuote.project_type || 'residential',
-            size_kw: parsedQuote.system_size_kw || null,
-            price: parsedQuote.quoted_revenue || null,
-            status: 'CREATED',
-            created_by: user.id,
-          } as never)
-          .select()
-          .single() as { data: { id: string } | null; error: any }
+            system_size_kw: parsedQuote.system_size_kw,
+            price: parsedQuote.quoted_revenue,
+          }),
+        })
 
-        if (projectError || !newProject) {
-          throw new Error(`Error al crear proyecto: ${projectError?.message || 'Error desconocido'}`)
+        const createResult = await createResponse.json()
+
+        if (!createResponse.ok) {
+          throw new Error(createResult.error || 'Error al crear cliente y proyecto')
         }
-        finalProjectId = newProject.id
+
+        finalProjectId = createResult.project_id
         setProjectId(finalProjectId)
       } else if (!finalProjectId) {
         throw new Error('Selecciona un proyecto o asegúrate de que el PDF contenga información del cliente y dirección de instalación')
