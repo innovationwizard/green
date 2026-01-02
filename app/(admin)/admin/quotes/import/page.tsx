@@ -91,7 +91,7 @@ export default function ImportQuotePage() {
           .select('id')
           .ilike('name', parsedQuote.client_name)
           .limit(1)
-          .single()
+          .single() as { data: { id: string } | null }
 
         if (existingClient) {
           clientId = existingClient.id
