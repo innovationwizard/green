@@ -67,27 +67,68 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 2: Create user in public.users
-    const { error: userError } = await supabase
+    // Step 2: Check if user already exists in public.users (trigger may have created it)
+    const { data: existingUser } = await supabase
       .from('users')
+      .select('id')
+      .eq('id', authData.user.id)
+      .single() as { data: Pick<UserRow, 'id'> | null }
+
+    if (existingUser) {
+      // User already exists (created by trigger), update it with admin-provided values
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Supabase type inference fails for update operations
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          email,
+          full_name: full_name || null,
+          role,
+          must_change_password: must_change_password ?? true,
+          created_by: user.id,
+        } as never)
+        .eq('id', authData.user.id)
+
+      if (updateError) {
+        // If update fails, try to delete the auth user
+        await adminClient.auth.admin.deleteUser(authData.user.id)
+        return NextResponse.json(
+          { error: `Error al actualizar usuario: ${updateError.message}` },
+          { status: 500 }
+        )
+      }
+    } else {
+      // User doesn't exist, create it
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - Supabase type inference fails for insert operations
-      .insert({
-        id: authData.user.id,
-        email,
-        full_name: full_name || null,
-        role,
-        must_change_password: must_change_password ?? true,
-        created_by: user.id,
-      } as never)
+      const { error: userError } = await supabase
+        .from('users')
+        .insert({
+          id: authData.user.id,
+          email,
+          full_name: full_name || null,
+          role,
+          must_change_password: must_change_password ?? true,
+          created_by: user.id,
+        } as never)
 
-    if (userError) {
-      // If user creation in public.users fails, try to delete the auth user
-      await adminClient.auth.admin.deleteUser(authData.user.id)
-      return NextResponse.json(
-        { error: userError.message },
-        { status: 500 }
-      )
+      if (userError) {
+        // If user creation in public.users fails, try to delete the auth user
+        await adminClient.auth.admin.deleteUser(authData.user.id)
+        
+        // Check if error is due to duplicate key
+        if (userError.code === '23505' || userError.message?.includes('duplicate key')) {
+          return NextResponse.json(
+            { error: 'El usuario ya existe en el sistema. Por favor, recarga la página.' },
+            { status: 409 }
+          )
+        }
+        
+        return NextResponse.json(
+          { error: `Error al crear usuario: ${userError.message}` },
+          { status: 500 }
+        )
+      }
     }
 
     return NextResponse.json({ 
