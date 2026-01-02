@@ -97,16 +97,16 @@ export default function ImportQuotePage() {
           clientId = existingClient.id
         } else {
           // Create new client
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore - Supabase type inference fails for insert operations
           const { data: newClient, error: clientError } = await supabase
             .from('clients')
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore - Supabase type inference fails for insert operations
             .insert({
               name: parsedQuote.client_name,
               created_by: user.id,
-            })
+            } as never)
             .select()
-            .single()
+            .single() as { data: { id: string } | null; error: any }
 
           if (clientError || !newClient) {
             throw new Error(`Error al crear cliente: ${clientError?.message || 'Error desconocido'}`)
@@ -121,10 +121,10 @@ export default function ImportQuotePage() {
           .substring(0, 20) || 'PROY-' + Date.now().toString().slice(-6)
 
         // Create new project
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore - Supabase type inference fails for insert operations
         const { data: newProject, error: projectError } = await supabase
           .from('projects')
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - Supabase type inference fails for insert operations
           .insert({
             human_id: projectHumanId,
             client_id: clientId,
@@ -134,9 +134,9 @@ export default function ImportQuotePage() {
             price: parsedQuote.quoted_revenue || null,
             status: 'CREATED',
             created_by: user.id,
-          })
+          } as never)
           .select()
-          .single()
+          .single() as { data: { id: string } | null; error: any }
 
         if (projectError || !newProject) {
           throw new Error(`Error al crear proyecto: ${projectError?.message || 'Error desconocido'}`)
