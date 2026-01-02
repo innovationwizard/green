@@ -39,11 +39,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - Supabase type inference fails for update operations
     const { error } = await supabase
       .from('users')
-      .update({ active })
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error - Supabase type inference fails for update operations
+      .update({ active } as never)
       .eq('id', userId)
 
     if (error) {

@@ -44,16 +44,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Update user in public.users
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - Supabase type inference fails for update operations
     const { error: updateError } = await supabase
       .from('users')
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error - Supabase type inference fails for update operations
       .update({
         email,
         full_name: full_name || null,
         role,
         must_change_password: must_change_password ?? false,
-      })
+      } as never)
       .eq('id', id)
 
     if (updateError) {

@@ -31,14 +31,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'ID de usuario requerido' }, { status: 400 })
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - Supabase type inference fails for update operations
     const { error } = await supabase
       .from('users')
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error - Supabase type inference fails for update operations
       .update({ 
         must_change_password: true,
         password_changed_at: null,
-      })
+      } as never)
       .eq('id', userId)
 
     if (error) {

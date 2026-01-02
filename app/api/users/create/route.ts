@@ -68,10 +68,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Step 2: Create user in public.users
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - Supabase type inference fails for insert operations
     const { error: userError } = await supabase
       .from('users')
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error - Supabase type inference fails for insert operations
       .insert({
         id: authData.user.id,
         email,
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         role,
         must_change_password: must_change_password ?? true,
         created_by: user.id,
-      })
+      } as never)
 
     if (userError) {
       // If user creation in public.users fails, try to delete the auth user
