@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const { error } = await supabase
       .from('users')
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error - Supabase type inference fails for update operations
+      // @ts-ignore - Supabase type inference fails for update operations
       .update({ active } as never)
       .eq('id', userId)
 

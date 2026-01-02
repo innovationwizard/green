@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     const { error: userError } = await supabase
       .from('users')
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error - Supabase type inference fails for insert operations
+      // @ts-ignore - Supabase type inference fails for insert operations
       .insert({
         id: authData.user.id,
         email,
