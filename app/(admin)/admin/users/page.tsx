@@ -12,7 +12,6 @@ import {
   Plus, 
   Search, 
   Edit, 
-  Trash2, 
   RefreshCw, 
   XCircle, 
   CheckCircle,
