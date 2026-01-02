@@ -7,7 +7,7 @@ const withPWA = require('next-pwa')({
   buildExcludes: [/middleware-manifest\.json$/, /app-build-manifest\.json$/],
   exclude: [
     // Exclude app-build-manifest.json (doesn't exist in Next.js 14 App Router)
-    ({ url }) => url.pathname.includes('/_next/app-build-manifest.json'),
+    ({ url }) => url?.pathname?.includes('/_next/app-build-manifest.json') || false,
   ],
   runtimeCaching: [
     {
