@@ -142,26 +142,11 @@ export function ServiceWorkerHandler() {
 
         // Check if it's a known non-existent file (ignore these)
         if (errorSource) {
-          // First check if errorSource contains the file path directly
-          if (knownNonExistentFiles.some(file => errorSource?.includes(file))) {
+          // Check if errorSource contains the file path directly (works for all cases)
+          // This is the primary check and doesn't require URL parsing
+          if (knownNonExistentFiles.some(file => errorSource.includes(file))) {
             console.debug('Ignoring 404 for known non-existent file')
             return
-          }
-          
-          // Try to parse as URL if it looks like a URL and we're in browser context
-          if (typeof window !== 'undefined' && window.location) {
-            try {
-              if (errorSource.startsWith('http') || errorSource.startsWith('/')) {
-                const url = new URL(errorSource, window.location.origin)
-                if (url?.pathname && knownNonExistentFiles.some(file => url.pathname.includes(file))) {
-                  // Silently ignore known non-existent files
-                  console.debug('Ignoring 404 for known non-existent file:', url.pathname)
-                  return
-                }
-              }
-            } catch {
-              // If URL parsing fails, ignore (already checked above)
-            }
           }
         }
 
