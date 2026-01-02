@@ -160,16 +160,22 @@ function parseQuoteData(data: QuoteDataRow[]): ParsedQuote {
   }
 }
 
-export async function extractPDFQuote(_file: File): Promise<ParsedQuote> {
-  // PDF extraction is a placeholder - requires pdf-parse or similar
-  // For now, return a basic structure
-  // In production, this would use pdf-parse with coordinate-based extraction
-  
-  throw new Error('PDF extraction not yet implemented. Please use CSV or XLSX format.')
-  
-  // Future implementation would look like:
-  // const pdfBuffer = await file.arrayBuffer()
-  // const pdfData = await pdfParse(Buffer.from(pdfBuffer))
-  // return parsePDFText(pdfData.text)
+export async function extractPDFQuote(file: File): Promise<ParsedQuote> {
+  // PDF extraction via API route (pdf-parse requires Node.js Buffer)
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const response = await fetch('/api/quotes/extract-pdf', {
+    method: 'POST',
+    body: formData,
+  })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.error || 'Error al extraer datos del PDF')
+  }
+
+  const result = await response.json()
+  return result.quote
 }
 
