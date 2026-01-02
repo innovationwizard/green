@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { parseCSVQuote, parseXLSXQuote, ParsedQuote } from '@/lib/import/quote-parser'
+import { parseCSVQuote, parseXLSXQuote, extractPDFQuote, ParsedQuote } from '@/lib/import/quote-parser'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -53,8 +53,10 @@ export default function ImportQuotePage() {
         quote = await parseCSVQuote(selectedFile)
       } else if (extension === 'xlsx' || extension === 'xls') {
         quote = await parseXLSXQuote(selectedFile)
+      } else if (extension === 'pdf') {
+        quote = await extractPDFQuote(selectedFile)
       } else {
-        throw new Error('Formato no soportado. Use CSV o XLSX.')
+        throw new Error('Formato no soportado. Use CSV, XLSX o PDF.')
       }
 
       setParsedQuote(quote)
@@ -162,16 +164,16 @@ export default function ImportQuotePage() {
         <CardContent className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">
-              Archivo CSV o XLSX
+              Archivo CSV, XLSX o PDF
             </label>
             <Input
               type="file"
-              accept=".csv,.xlsx,.xls"
+              accept=".csv,.xlsx,.xls,.pdf"
               onChange={handleFileSelect}
               disabled={loading}
             />
             <p className="text-sm text-muted-foreground mt-2">
-              Formatos soportados: CSV, XLSX
+              Formatos soportados: CSV, XLSX, PDF
             </p>
           </div>
 
