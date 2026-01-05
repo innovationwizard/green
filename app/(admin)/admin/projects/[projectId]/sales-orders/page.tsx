@@ -8,11 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ArrowLeft, Plus, CheckCircle2, XCircle } from 'lucide-react'
-import { ParsedPurchaseOrder } from '@/app/api/purchase-orders/extract-pdf/route'
+import { ParsedSalesOrder } from '@/app/api/sales-orders/extract-pdf/route'
 
 type SalespersonRow = Database['public']['Tables']['salespeople']['Row']
 
-interface PurchaseOrderWithItems {
+interface SalesOrderWithItems {
   id: string
   project_id: string
   po_number: string
@@ -25,7 +25,7 @@ interface PurchaseOrderWithItems {
   total: number
   source: string
   created_at: string
-  purchase_order_items: Array<{
+  sales_order_items: Array<{
     id: string
     line_number: number
     article_number: string | null
@@ -47,15 +47,15 @@ interface PurchaseOrderWithItems {
   } | null
 }
 
-export default function PurchaseOrdersPage() {
+export default function SalesOrdersPage() {
   const router = useRouter()
   const params = useParams()
   const projectId = params.projectId as string
   const supabase = createClient()
   
-  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderWithItems[]>([])
+  const [salesOrders, setSalesOrders] = useState<SalesOrderWithItems[]>([])
   const [salespeople, setSalespeople] = useState<SalespersonRow[]>([])
-  const [parsedPO, setParsedPO] = useState<ParsedPurchaseOrder | null>(null)
+  const [parsedSO, setParsedSO] = useState<ParsedSalesOrder | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showImportForm, setShowImportForm] = useState(false)
@@ -68,19 +68,19 @@ export default function PurchaseOrdersPage() {
   } | null>(null)
 
   useEffect(() => {
-    loadPurchaseOrders()
+    loadSalesOrders()
     loadSalespeople()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId])
 
-  async function loadPurchaseOrders() {
+  async function loadSalesOrders() {
     setLoading(true)
     try {
-      const response = await fetch(`/api/purchase-orders/list?project_id=${projectId}`)
+      const response = await fetch(`/api/sales-orders/list?project_id=${projectId}`)
       const result = await response.json()
       
       if (result.success) {
-        setPurchaseOrders(result.purchase_orders || [])
+        setSalesOrders(result.sales_orders || [])
       } else {
         setError(result.error || 'Error al cargar órdenes de venta')
       }
@@ -108,7 +108,7 @@ export default function PurchaseOrdersPage() {
     if (!selectedFile) return
 
     setError(null)
-    setParsedPO(null)
+    setParsedSO(null)
     setMatchingItems({})
     setEditablePO(null)
 
@@ -122,7 +122,7 @@ export default function PurchaseOrdersPage() {
       const formData = new FormData()
       formData.append('file', selectedFile)
 
-      const response = await fetch('/api/purchase-orders/extract-pdf', {
+      const response = await fetch('/api/sales-orders/extract-pdf', {
         method: 'POST',
         body: formData,
       })
@@ -130,23 +130,23 @@ export default function PurchaseOrdersPage() {
       const result = await response.json()
 
       if (result.success) {
-        const po = result.purchase_order
-        setParsedPO(po)
+        const so = result.sales_order
+        setParsedSO(so)
         
         // Check for missing required fields and prepare editable form
-        const needsInput = !po.po_number || !po.issue_date || !po.total || po.total === 0
+        const needsInput = !so.po_number || !so.issue_date || !so.total || so.total === 0
         if (needsInput) {
           setEditablePO({
-            po_number: po.po_number || '',
-            issue_date: po.issue_date || new Date().toISOString().split('T')[0],
-            total: po.total || 0,
+            po_number: so.po_number || '',
+            issue_date: so.issue_date || new Date().toISOString().split('T')[0],
+            total: so.total || 0,
           })
         } else {
           setEditablePO(null)
         }
         
         // Auto-match items
-        await matchItems(po.line_items)
+        await matchItems(so.line_items)
       } else {
         setError(result.error || 'Error al procesar PDF')
       }
@@ -157,9 +157,9 @@ export default function PurchaseOrdersPage() {
     }
   }
 
-  async function matchItems(lineItems: ParsedPurchaseOrder['line_items']) {
+  async function matchItems(lineItems: ParsedSalesOrder['line_items']) {
     try {
-      const response = await fetch('/api/purchase-orders/match-items', {
+      const response = await fetch('/api/sales-orders/match-items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ line_items: lineItems }),
@@ -221,21 +221,21 @@ export default function PurchaseOrdersPage() {
         }
       }
 
-      const response = await fetch('/api/purchase-orders/create', {
+      const response = await fetch('/api/sales-orders/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           project_id: projectId,
           po_number: finalPONumber,
-          vendor: parsedPO.vendor,
+          vendor: parsedSO.vendor,
           issue_date: finalIssueDate,
-          delivery_date: parsedPO.delivery_date,
+          delivery_date: parsedSO.delivery_date,
           salesperson_id: salespersonId,
-          subtotal: parsedPO.subtotal,
-          tax: parsedPO.tax,
+          subtotal: parsedSO.subtotal,
+          tax: parsedSO.tax,
           total: finalTotal,
           source: 'pdf_import',
-          line_items: parsedPO.line_items.map((item, index) => ({
+          line_items: parsedSO.line_items.map((item, index) => ({
             ...item,
             item_id: matchingItems[index] || null,
           })),
@@ -245,11 +245,11 @@ export default function PurchaseOrdersPage() {
       const result = await response.json()
 
       if (result.success) {
-        setParsedPO(null)
+        setParsedSO(null)
         setMatchingItems({})
         setEditablePO(null)
         setShowImportForm(false)
-        await loadPurchaseOrders()
+        await loadSalesOrders()
       } else {
         setError(result.error || 'Error al importar orden de venta')
       }
@@ -260,7 +260,7 @@ export default function PurchaseOrdersPage() {
     }
   }
 
-  if (loading && purchaseOrders.length === 0) {
+  if (loading && salesOrders.length === 0) {
     return <div className="p-4">Cargando órdenes de venta...</div>
   }
 
@@ -304,12 +304,12 @@ export default function PurchaseOrdersPage() {
               />
             </div>
 
-            {parsedPO && (
+            {parsedSO && (
               <div className="space-y-4 border-t pt-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium">
-                      Número de PO {!parsedPO.po_number && <span className="text-red-500">*</span>}
+                      Número de PO {!parsedSO.po_number && <span className="text-red-500">*</span>}
                     </label>
                     {editablePO ? (
                       <Input
@@ -320,12 +320,12 @@ export default function PurchaseOrdersPage() {
                         className="mt-1"
                       />
                     ) : (
-                      <p className="text-lg font-semibold">{parsedPO.po_number}</p>
+                      <p className="text-lg font-semibold">{parsedSO.po_number}</p>
                     )}
                   </div>
                   <div>
                     <label className="text-sm font-medium">
-                      Total {(!parsedPO.total || parsedPO.total === 0) && <span className="text-red-500">*</span>}
+                      Total {(!parsedSO.total || parsedSO.total === 0) && <span className="text-red-500">*</span>}
                     </label>
                     {editablePO ? (
                       <Input
@@ -338,19 +338,19 @@ export default function PurchaseOrdersPage() {
                       />
                     ) : (
                       <p className="text-lg font-semibold">
-                        Q {parsedPO.total.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        Q {parsedSO.total.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                     )}
                   </div>
-                  {parsedPO.vendor && (
+                  {parsedSO.vendor && (
                     <div>
                       <label className="text-sm font-medium">Proveedor</label>
-                      <p>{parsedPO.vendor}</p>
+                      <p>{parsedSO.vendor}</p>
                     </div>
                   )}
                   <div>
                     <label className="text-sm font-medium">
-                      Fecha de Emisión {!parsedPO.issue_date && <span className="text-red-500">*</span>}
+                      Fecha de Emisión {!parsedSO.issue_date && <span className="text-red-500">*</span>}
                     </label>
                     {editablePO ? (
                       <Input
@@ -360,13 +360,13 @@ export default function PurchaseOrdersPage() {
                         className="mt-1"
                       />
                     ) : (
-                      <p>{parsedPO.issue_date ? new Date(parsedPO.issue_date).toLocaleDateString('es-GT') : 'No encontrada'}</p>
+                      <p>{parsedSO.issue_date ? new Date(parsedSO.issue_date).toLocaleDateString('es-GT') : 'No encontrada'}</p>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Items ({parsedPO.line_items.length})</label>
+                  <label className="text-sm font-medium mb-2 block">Items ({parsedSO.line_items.length})</label>
                   <div className="border rounded-lg overflow-hidden">
                     <table className="w-full text-sm">
                       <thead className="bg-gray-50">
@@ -381,7 +381,7 @@ export default function PurchaseOrdersPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {parsedPO.line_items.map((item, index) => (
+                        {parsedSO.line_items.map((item, index) => (
                           <tr key={index} className="border-t">
                             <td className="px-4 py-2">{item.line_number}</td>
                             <td className="px-4 py-2 font-mono text-xs">
@@ -419,21 +419,21 @@ export default function PurchaseOrdersPage() {
       )}
 
       <div className="space-y-4">
-        {purchaseOrders.length === 0 ? (
+        {salesOrders.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center text-muted-foreground">
               No hay órdenes de venta para este proyecto
             </CardContent>
           </Card>
         ) : (
-          purchaseOrders.map((po) => (
-            <Card key={po.id}>
+          salesOrders.map((so) => (
+            <Card key={so.id}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle>PO #{po.po_number}</CardTitle>
+                    <CardTitle>PO #{so.po_number}</CardTitle>
                     <p className="text-sm text-muted-foreground mt-1">
-                      {new Date(po.issue_date).toLocaleDateString('es-GT', {
+                      {new Date(so.issue_date).toLocaleDateString('es-GT', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
@@ -442,33 +442,33 @@ export default function PurchaseOrdersPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold">
-                      Q {po.total.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      Q {so.total.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
-                    {po.subtotal && po.tax && (
+                    {so.subtotal && so.tax && (
                       <p className="text-sm text-muted-foreground">
-                        Subtotal: Q {po.subtotal.toLocaleString('es-GT', { minimumFractionDigits: 2 })}
+                        Subtotal: Q {so.subtotal.toLocaleString('es-GT', { minimumFractionDigits: 2 })}
                         {' | '}
-                        Impuesto: Q {po.tax.toLocaleString('es-GT', { minimumFractionDigits: 2 })}
+                        Impuesto: Q {so.tax.toLocaleString('es-GT', { minimumFractionDigits: 2 })}
                       </p>
                     )}
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                {po.vendor && (
+                {so.vendor && (
                   <p className="text-sm mb-2">
-                    <span className="font-medium">Proveedor:</span> {po.vendor}
+                    <span className="font-medium">Proveedor:</span> {so.vendor}
                   </p>
                 )}
-                {po.salesperson && (
+                {so.salesperson && (
                   <p className="text-sm mb-2">
-                    <span className="font-medium">Vendedor:</span> {po.salesperson.name}
+                    <span className="font-medium">Vendedor:</span> {so.salesperson.name}
                   </p>
                 )}
-                {po.delivery_date && (
+                {so.delivery_date && (
                   <p className="text-sm mb-4">
                     <span className="font-medium">Fecha de Entrega:</span>{' '}
-                    {new Date(po.delivery_date).toLocaleDateString('es-GT')}
+                    {new Date(so.delivery_date).toLocaleDateString('es-GT')}
                   </p>
                 )}
                 <div className="border rounded-lg overflow-hidden mt-4">
@@ -485,7 +485,7 @@ export default function PurchaseOrdersPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {po.purchase_order_items.map((item) => (
+                      {so.sales_order_items.map((item) => (
                         <tr key={item.id} className="border-t">
                           <td className="px-4 py-2">{item.line_number}</td>
                           <td className="px-4 py-2 font-mono text-xs">

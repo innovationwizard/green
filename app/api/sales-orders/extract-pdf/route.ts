@@ -5,7 +5,7 @@ import { Database } from '@/types/database.types'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 
-export interface ParsedPurchaseOrder {
+export interface ParsedSalesOrder {
   po_number: string
   vendor?: string
   issue_date: string // ISO date string
@@ -64,10 +64,10 @@ export async function POST(request: NextRequest) {
     const pdfData = await pdfParse(buffer)
     const text = pdfData.text
 
-    // Parse the extracted text to find purchase order data
-    const parsedPO = parsePDFText(text)
+    // Parse the extracted text to find sales order data
+    const parsedSO = parsePDFText(text)
 
-    return NextResponse.json({ success: true, purchase_order: parsedPO })
+    return NextResponse.json({ success: true, sales_order: parsedSO })
   } catch (error) {
     console.error('Error extracting PDF:', error)
     return NextResponse.json(
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function parsePDFText(text: string): ParsedPurchaseOrder {
+function parsePDFText(text: string): ParsedSalesOrder {
   const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0)
   
   let po_number = ''
@@ -88,7 +88,7 @@ function parsePDFText(text: string): ParsedPurchaseOrder {
   let subtotal: number | undefined
   let tax: number | undefined
   let total = 0
-  const line_items: ParsedPurchaseOrder['line_items'] = []
+  const line_items: ParsedSalesOrder['line_items'] = []
 
   // Extract header information (usually first 40 lines)
   for (let i = 0; i < Math.min(40, lines.length); i++) {

@@ -137,7 +137,7 @@ export default async function ProjectsPage() {
                   )}
                   <div className="flex gap-2 pt-2 border-t">
                     <Link
-                      href={`/admin/projects/${project.id}/purchase-orders`}
+                      href={`/admin/projects/${project.id}/sales-orders`}
                       className="flex items-center gap-1 text-sm text-primary hover:underline"
                     >
                       <ShoppingCart className="w-4 h-4" />

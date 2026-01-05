@@ -316,7 +316,7 @@ export interface Database {
           updated_at?: string
         }
       }
-      purchase_orders: {
+      sales_orders: {
         Row: {
           id: string
           project_id: string | null
@@ -362,10 +362,10 @@ export interface Database {
           updated_at?: string
         }
       }
-      purchase_order_items: {
+      sales_order_items: {
         Row: {
           id: string
-          purchase_order_id: string
+          sales_order_id: string
           line_number: number
           article_number: string | null
           item_id: string | null
@@ -378,7 +378,7 @@ export interface Database {
         }
         Insert: {
           id?: string
-          purchase_order_id: string
+          sales_order_id: string
           line_number: number
           article_number?: string | null
           item_id?: string | null
@@ -390,7 +390,7 @@ export interface Database {
         }
         Update: {
           id?: string
-          purchase_order_id?: string
+          sales_order_id?: string
           line_number?: number
           article_number?: string | null
           item_id?: string | null

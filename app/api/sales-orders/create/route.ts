@@ -4,7 +4,7 @@ import { Database } from '@/types/database.types'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 
-interface CreatePurchaseOrderRequest {
+interface CreateSalesOrderRequest {
   project_id: string
   po_number: string
   vendor?: string
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
     }
 
-    const body: CreatePurchaseOrderRequest = await request.json()
+    const body: CreateSalesOrderRequest = await request.json()
 
     // Validate required fields
     if (!body.project_id || !body.po_number || !body.issue_date || !body.total) {
@@ -75,11 +75,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Proyecto no encontrado' }, { status: 404 })
     }
 
-    // Create purchase order header
-    // Type assertion needed because Supabase client types haven't been regenerated with purchase_orders table
+    // Create sales order header
+    // Type assertion needed because Supabase client types haven't been regenerated with sales_orders table
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const poResult = await (supabase
-      .from('purchase_orders') as any)
+    const soResult = await (supabase
+      .from('sales_orders') as any)
       .insert({
         project_id: body.project_id,
         po_number: body.po_number,
@@ -96,20 +96,20 @@ export async function POST(request: NextRequest) {
       .select()
       .single() as any
     
-    const purchaseOrder = poResult?.data as Database['public']['Tables']['purchase_orders']['Row'] | null
-    const poError = poResult?.error as { message: string } | null
+    const salesOrder = soResult?.data as Database['public']['Tables']['sales_orders']['Row'] | null
+    const soError = soResult?.error as { message: string } | null
 
-    if (poError || !purchaseOrder) {
-      console.error('Error creating purchase order:', poError)
+    if (soError || !salesOrder) {
+      console.error('Error creating sales order:', soError)
       return NextResponse.json(
-        { error: poError?.message || 'Error al crear orden de venta' },
+        { error: soError?.message || 'Error al crear orden de venta' },
         { status: 500 }
       )
     }
 
-    // Create purchase order items
+    // Create sales order items
     const itemsToInsert = body.line_items.map(item => ({
-      purchase_order_id: purchaseOrder.id,
+      sales_order_id: salesOrder.id,
       line_number: item.line_number,
       article_number: item.article_number || null,
       item_id: item.item_id || null,
@@ -121,43 +121,43 @@ export async function POST(request: NextRequest) {
     }))
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - Supabase type inference doesn't recognize purchase_order_items table yet
-    // Type assertion needed because Supabase client types haven't been regenerated with purchase_order_items table
+    // @ts-ignore - Supabase type inference doesn't recognize sales_order_items table yet
+    // Type assertion needed because Supabase client types haven't been regenerated with sales_order_items table
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: itemsError } = await (supabase
-      .from('purchase_order_items') as any)
+      .from('sales_order_items') as any)
       .insert(itemsToInsert) as any
 
     if (itemsError) {
-      console.error('Error creating purchase order items:', itemsError)
-      // Rollback: delete the purchase order if items insertion fails
-      await supabase.from('purchase_orders').delete().eq('id', purchaseOrder.id)
+      console.error('Error creating sales order items:', itemsError)
+      // Rollback: delete the sales order if items insertion fails
+      await supabase.from('sales_orders').delete().eq('id', salesOrder.id)
       return NextResponse.json(
         { error: itemsError.message || 'Error al crear items de orden de venta' },
         { status: 500 }
       )
     }
 
-    // Fetch the complete purchase order with items
-    const { data: completePO, error: fetchError } = await supabase
-      .from('purchase_orders')
+    // Fetch the complete sales order with items
+    const { data: completeSO, error: fetchError } = await supabase
+      .from('sales_orders')
       .select(`
         *,
-        purchase_order_items (*)
+        sales_order_items (*)
       `)
-      .eq('id', purchaseOrder.id)
+      .eq('id', salesOrder.id)
       .single()
 
     if (fetchError) {
-      console.error('Error fetching complete purchase order:', fetchError)
+      console.error('Error fetching complete sales order:', fetchError)
     }
 
     return NextResponse.json({
       success: true,
-      purchase_order: completePO || purchaseOrder,
+      sales_order: completeSO || salesOrder,
     })
   } catch (error) {
-    console.error('Error creating purchase order:', error)
+    console.error('Error creating sales order:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error al procesar solicitud' },
       { status: 500 }

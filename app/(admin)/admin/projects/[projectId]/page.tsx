@@ -206,7 +206,7 @@ export default async function ProjectPage({ params }: Params) {
           </CardContent>
         </Card>
 
-        {/* Purchase Orders */}
+        {/* Sales Orders */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -214,7 +214,7 @@ export default async function ProjectPage({ params }: Params) {
                 <ShoppingCart className="w-5 h-5" />
                 Órdenes de Venta
               </div>
-              <Link href={`/admin/projects/${params.projectId}/purchase-orders`}>
+              <Link href={`/admin/projects/${params.projectId}/sales-orders`}>
                 <Button variant="outline" size="sm">
                   Ver Todas
                 </Button>
@@ -224,7 +224,7 @@ export default async function ProjectPage({ params }: Params) {
           <CardContent>
             <p className="text-muted-foreground text-center py-4">
               <Link 
-                href={`/admin/projects/${params.projectId}/purchase-orders`}
+                href={`/admin/projects/${params.projectId}/sales-orders`}
                 className="text-primary hover:underline"
               >
                 Gestionar órdenes de venta

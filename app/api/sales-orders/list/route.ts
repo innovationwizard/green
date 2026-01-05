@@ -29,13 +29,13 @@ export async function GET(request: NextRequest) {
     const projectId = searchParams.get('project_id')
 
     // Build query
-    // Type assertion needed because Supabase client types haven't been regenerated with purchase_orders table
+    // Type assertion needed because Supabase client types haven't been regenerated with sales_orders table
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query: any = supabase
-      .from('purchase_orders')
+      .from('sales_orders')
       .select(`
         *,
-        purchase_order_items (
+        sales_order_items (
           *,
           item:items (
             id,
@@ -56,10 +56,10 @@ export async function GET(request: NextRequest) {
       query = query.eq('project_id', projectId)
     }
 
-    const { data: purchaseOrders, error } = await query
+    const { data: salesOrders, error } = await query
 
     if (error) {
-      console.error('Error fetching purchase orders:', error)
+      console.error('Error fetching sales orders:', error)
       return NextResponse.json(
         { error: error.message || 'Error al obtener órdenes de venta' },
         { status: 500 }
@@ -68,10 +68,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      purchase_orders: purchaseOrders || [],
+      sales_orders: salesOrders || [],
     })
   } catch (error) {
-    console.error('Error listing purchase orders:', error)
+    console.error('Error listing sales orders:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Error al procesar solicitud' },
       { status: 500 }
