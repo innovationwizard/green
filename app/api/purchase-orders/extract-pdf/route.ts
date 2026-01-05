@@ -297,15 +297,8 @@ function parsePDFText(text: string): ParsedPurchaseOrder {
     subtotal = line_items.reduce((sum, item) => sum + item.line_total, 0)
   }
 
-  // Default PO number if not found
-  if (!po_number) {
-    po_number = `PO-${Date.now()}`
-  }
-
-  // Default issue date if not found
-  if (!issue_date) {
-    issue_date = new Date().toISOString().split('T')[0]
-  }
+  // Don't set defaults - let the UI handle missing values
+  // This allows the user to fill in missing information
 
   return {
     po_number,

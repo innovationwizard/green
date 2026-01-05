@@ -60,6 +60,12 @@ export default function PurchaseOrdersPage() {
   const [error, setError] = useState<string | null>(null)
   const [showImportForm, setShowImportForm] = useState(false)
   const [matchingItems, setMatchingItems] = useState<Record<number, string | null>>({})
+  // Editable fields for missing values
+  const [editablePO, setEditablePO] = useState<{
+    po_number: string
+    issue_date: string
+    total: number
+  } | null>(null)
 
   useEffect(() => {
     loadPurchaseOrders()
@@ -104,6 +110,7 @@ export default function PurchaseOrdersPage() {
     setError(null)
     setParsedPO(null)
     setMatchingItems({})
+    setEditablePO(null)
 
     if (selectedFile.type !== 'application/pdf') {
       setError('Solo se aceptan archivos PDF')
@@ -123,9 +130,23 @@ export default function PurchaseOrdersPage() {
       const result = await response.json()
 
       if (result.success) {
-        setParsedPO(result.purchase_order)
+        const po = result.purchase_order
+        setParsedPO(po)
+        
+        // Check for missing required fields and prepare editable form
+        const needsInput = !po.po_number || !po.issue_date || !po.total || po.total === 0
+        if (needsInput) {
+          setEditablePO({
+            po_number: po.po_number || '',
+            issue_date: po.issue_date || new Date().toISOString().split('T')[0],
+            total: po.total || 0,
+          })
+        } else {
+          setEditablePO(null)
+        }
+        
         // Auto-match items
-        await matchItems(result.purchase_order.line_items)
+        await matchItems(po.line_items)
       } else {
         setError(result.error || 'Error al procesar PDF')
       }
@@ -166,6 +187,21 @@ export default function PurchaseOrdersPage() {
       return
     }
 
+    // Validate required fields - use editable values if available, otherwise use parsed values
+    const finalPONumber = editablePO?.po_number || parsedPO.po_number
+    const finalIssueDate = editablePO?.issue_date || parsedPO.issue_date
+    const finalTotal = editablePO?.total || parsedPO.total
+
+    if (!finalPONumber || !finalIssueDate || !finalTotal || finalTotal === 0) {
+      setError('Por favor completa los campos requeridos: Número de PO, Fecha de Emisión, y Total')
+      return
+    }
+
+    if (!projectId) {
+      setError('No se pudo identificar el proyecto')
+      return
+    }
+
     setLoading(true)
     setError(null)
 
@@ -190,14 +226,14 @@ export default function PurchaseOrdersPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           project_id: projectId,
-          po_number: parsedPO.po_number,
+          po_number: finalPONumber,
           vendor: parsedPO.vendor,
-          issue_date: parsedPO.issue_date,
+          issue_date: finalIssueDate,
           delivery_date: parsedPO.delivery_date,
           salesperson_id: salespersonId,
           subtotal: parsedPO.subtotal,
           tax: parsedPO.tax,
-          total: parsedPO.total,
+          total: finalTotal,
           source: 'pdf_import',
           line_items: parsedPO.line_items.map((item, index) => ({
             ...item,
@@ -211,6 +247,7 @@ export default function PurchaseOrdersPage() {
       if (result.success) {
         setParsedPO(null)
         setMatchingItems({})
+        setEditablePO(null)
         setShowImportForm(false)
         await loadPurchaseOrders()
       } else {
@@ -271,14 +308,39 @@ export default function PurchaseOrdersPage() {
               <div className="space-y-4 border-t pt-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium">Número de PO</label>
-                    <p className="text-lg font-semibold">{parsedPO.po_number}</p>
+                    <label className="text-sm font-medium">
+                      Número de PO {!parsedPO.po_number && <span className="text-red-500">*</span>}
+                    </label>
+                    {editablePO ? (
+                      <Input
+                        type="text"
+                        value={editablePO.po_number}
+                        onChange={(e) => setEditablePO({ ...editablePO, po_number: e.target.value })}
+                        placeholder="Ej: 2657"
+                        className="mt-1"
+                      />
+                    ) : (
+                      <p className="text-lg font-semibold">{parsedPO.po_number}</p>
+                    )}
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Total</label>
-                    <p className="text-lg font-semibold">
-                      Q {parsedPO.total.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </p>
+                    <label className="text-sm font-medium">
+                      Total {(!parsedPO.total || parsedPO.total === 0) && <span className="text-red-500">*</span>}
+                    </label>
+                    {editablePO ? (
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={editablePO.total || ''}
+                        onChange={(e) => setEditablePO({ ...editablePO, total: parseFloat(e.target.value) || 0 })}
+                        placeholder="0.00"
+                        className="mt-1"
+                      />
+                    ) : (
+                      <p className="text-lg font-semibold">
+                        Q {parsedPO.total.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    )}
                   </div>
                   {parsedPO.vendor && (
                     <div>
@@ -287,8 +349,19 @@ export default function PurchaseOrdersPage() {
                     </div>
                   )}
                   <div>
-                    <label className="text-sm font-medium">Fecha de Emisión</label>
-                    <p>{new Date(parsedPO.issue_date).toLocaleDateString('es-GT')}</p>
+                    <label className="text-sm font-medium">
+                      Fecha de Emisión {!parsedPO.issue_date && <span className="text-red-500">*</span>}
+                    </label>
+                    {editablePO ? (
+                      <Input
+                        type="date"
+                        value={editablePO.issue_date}
+                        onChange={(e) => setEditablePO({ ...editablePO, issue_date: e.target.value })}
+                        className="mt-1"
+                      />
+                    ) : (
+                      <p>{parsedPO.issue_date ? new Date(parsedPO.issue_date).toLocaleDateString('es-GT') : 'No encontrada'}</p>
+                    )}
                   </div>
                 </div>
 
