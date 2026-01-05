@@ -59,17 +59,18 @@
 - [x] Página de dashboards (listado mejorado)
 - [x] Dashboard de Resumen Ejecutivo (KPIs básicos)
 - [x] Estructura para otros dashboards
-- [x] **Sistema de Órdenes de Compra (Purchase Orders)**:
-  - [x] Schema de base de datos (purchase_orders, purchase_order_items)
+- [x] **Sistema de Órdenes de Venta (Sales Orders)**:
+  - [x] Schema de base de datos (sales_orders, sales_order_items)
   - [x] Columna sap_article_number en items para matching automático
   - [x] API routes: extract-pdf, create, list, match-items
-  - [x] UI de gestión de POs por proyecto
+  - [x] UI de gestión de órdenes de venta por proyecto
   - [x] Importación de PDF con extracción automática
   - [x] Matching automático de items por SAP article number y descripción
   - [x] Indicadores visuales de items matched/unmatched
   - [x] **Extracción mejorada de PDF**: Parsing robusto de formato ORDEN (PO number, fechas, totales, line items)
   - [x] Manejo de campos requeridos faltantes con UI editable
   - [x] Corrección: "Para" es cliente, no vendor (vendor field valioso para tracking de proveedores)
+  - [x] **Refactor completo**: Renombrado de Purchase Orders a Sales Orders (migración 007 aplicada)
 
 ### UI de Manager (CEO)
 - [x] Layout de manager
@@ -132,7 +133,7 @@
 ### Funcionalidades Avanzadas
 - [ ] Importación de cotizaciones (CSV/XLSX)
 - [ ] Extracción de PDF de cotizaciones
-- [x] **Sistema de Órdenes de Compra**: Extracción de PDF de órdenes de compra (mejorado)
+- [x] **Sistema de Órdenes de Venta**: Extracción de PDF de órdenes de venta (mejorado)
 - [ ] Centro de excepciones (duplicados + reglas de omisión)
 - [ ] Constructor de reglas de omisión
 - [ ] Exportación de auditoría (CSV/XLSX/PDF)
@@ -182,13 +183,13 @@
 - **Offline**: ✅ 90% (funcional, falta optimización de conflictos)
 - **Sincronización**: ✅ 80% (básica funcionando, falta detección avanzada de duplicados)
 - **Dashboards**: ✅ 25% (1 de 4 completo)
-- **Admin UI**: ✅ 60% (estructura creada + landing page completa + Purchase Orders, falta CRUD completo)
+- **Admin UI**: ✅ 60% (estructura creada + landing page completa + Sales Orders, falta CRUD completo)
 - **Manager UI**: ✅ 50% (landing page completa con KPIs, falta dashboards detallados)
 - **Installer UI**: ✅ 95% (landing page completa, todas las funcionalidades core)
 - **Developer UI**: ✅ 100% (dashboard completo con monitoreo y herramientas)
 - **Proyecciones**: ✅ 70% (funciones SQL creadas, falta scheduled jobs)
 - **Landing Pages**: ✅ 100% (todas las landing pages implementadas siguiendo mejores prácticas)
-- **Purchase Orders**: ✅ 90% (sistema completo con extracción mejorada de PDF, falta integración con dashboards de economía unitaria)
+- **Sales Orders**: ✅ 90% (sistema completo con extracción mejorada de PDF, falta integración con dashboards de economía unitaria)
 
 ## 🚀 Listo para Producción
 

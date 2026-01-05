@@ -4,11 +4,27 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 
 ## [Unreleased] - 2024
 
+### Cambiado
+
+#### Refactor: Sistema de Órdenes de Compra → Sistema de Órdenes de Venta
+
+- **Renombramiento Completo del Sistema**:
+  - Tablas de base de datos: `purchase_orders` → `sales_orders`, `purchase_order_items` → `sales_order_items`
+  - Columna: `purchase_order_id` → `sales_order_id`
+  - Rutas de API: `/api/purchase-orders/` → `/api/sales-orders/`
+  - Rutas de UI: `/admin/projects/[id]/purchase-orders` → `/admin/projects/[id]/sales-orders`
+  - Tipos TypeScript: `ParsedPurchaseOrder` → `ParsedSalesOrder`, `CreatePurchaseOrderRequest` → `CreateSalesOrderRequest`
+  - Variables y funciones: `purchaseOrder` → `salesOrder`, `loadPurchaseOrders()` → `loadSalesOrders()`
+  - Migración de base de datos creada: `007_rename_purchase_orders_to_sales_orders.sql`
+  - Actualización completa de documentación y tipos de base de datos
+
+**Razón del cambio**: El sistema maneja órdenes de venta (lo que Green vende a clientes), no órdenes de compra (lo que Green compra a proveedores). La terminología ahora refleja correctamente el propósito del sistema.
+
 ### Agregado
 
-#### Sistema de Órdenes de Compra (Purchase Orders) - Mejoras de Extracción PDF
+#### Sistema de Órdenes de Venta (Sales Orders) - Mejoras de Extracción PDF
 
-- **Mejoras en Extracción de PDF de Órdenes de Compra**:
+- **Mejoras en Extracción de PDF de Órdenes de Venta**:
   - Extracción mejorada del número de orden (PO number) - detecta patrones como "Pedido de cliente 2657"
   - Extracción mejorada de fechas (emisión y entrega) - maneja formato DD/MM/YYYY de Guatemala
   - Extracción mejorada de totales - maneja prefijos de moneda "QTZ" y "Q"
