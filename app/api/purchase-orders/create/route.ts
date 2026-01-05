@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     if (!body.line_items || body.line_items.length === 0) {
       return NextResponse.json(
-        { error: 'Debe incluir al menos un item en la orden de compra' },
+        { error: 'Debe incluir al menos un item en la orden de venta' },
         { status: 400 }
       )
     }
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     if (poError || !purchaseOrder) {
       console.error('Error creating purchase order:', poError)
       return NextResponse.json(
-        { error: poError?.message || 'Error al crear orden de compra' },
+        { error: poError?.message || 'Error al crear orden de venta' },
         { status: 500 }
       )
     }
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
       // Rollback: delete the purchase order if items insertion fails
       await supabase.from('purchase_orders').delete().eq('id', purchaseOrder.id)
       return NextResponse.json(
-        { error: itemsError.message || 'Error al crear items de orden de compra' },
+        { error: itemsError.message || 'Error al crear items de orden de venta' },
         { status: 500 }
       )
     }

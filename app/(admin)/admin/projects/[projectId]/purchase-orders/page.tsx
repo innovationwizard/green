@@ -82,10 +82,10 @@ export default function PurchaseOrdersPage() {
       if (result.success) {
         setPurchaseOrders(result.purchase_orders || [])
       } else {
-        setError(result.error || 'Error al cargar órdenes de compra')
+        setError(result.error || 'Error al cargar órdenes de venta')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar órdenes de compra')
+      setError(err instanceof Error ? err.message : 'Error al cargar órdenes de venta')
     } finally {
       setLoading(false)
     }
@@ -251,17 +251,17 @@ export default function PurchaseOrdersPage() {
         setShowImportForm(false)
         await loadPurchaseOrders()
       } else {
-        setError(result.error || 'Error al importar orden de compra')
+        setError(result.error || 'Error al importar orden de venta')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al importar orden de compra')
+      setError(err instanceof Error ? err.message : 'Error al importar orden de venta')
     } finally {
       setLoading(false)
     }
   }
 
   if (loading && purchaseOrders.length === 0) {
-    return <div className="p-4">Cargando órdenes de compra...</div>
+    return <div className="p-4">Cargando órdenes de venta...</div>
   }
 
   return (
@@ -272,7 +272,7 @@ export default function PurchaseOrdersPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver
           </Button>
-          <h1 className="text-3xl font-bold">Órdenes de Compra</h1>
+          <h1 className="text-3xl font-bold">Órdenes de Venta</h1>
         </div>
         <Button onClick={() => setShowImportForm(!showImportForm)}>
           <Plus className="w-4 h-4 mr-2" />
@@ -289,7 +289,7 @@ export default function PurchaseOrdersPage() {
       {showImportForm && (
         <Card>
           <CardHeader>
-            <CardTitle>Importar Orden de Compra desde PDF</CardTitle>
+            <CardTitle>Importar Orden de Venta desde PDF</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -410,7 +410,7 @@ export default function PurchaseOrdersPage() {
                 </div>
 
                 <Button onClick={handleImport} disabled={loading} className="w-full">
-                  {loading ? 'Importando...' : 'Importar Orden de Compra'}
+                  {loading ? 'Importando...' : 'Importar Orden de Venta'}
                 </Button>
               </div>
             )}
@@ -422,7 +422,7 @@ export default function PurchaseOrdersPage() {
         {purchaseOrders.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center text-muted-foreground">
-              No hay órdenes de compra para este proyecto
+              No hay órdenes de venta para este proyecto
             </CardContent>
           </Card>
         ) : (

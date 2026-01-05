@@ -212,7 +212,7 @@ export default async function ProjectPage({ params }: Params) {
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ShoppingCart className="w-5 h-5" />
-                Órdenes de Compra
+                Órdenes de Venta
               </div>
               <Link href={`/admin/projects/${params.projectId}/purchase-orders`}>
                 <Button variant="outline" size="sm">
@@ -227,7 +227,7 @@ export default async function ProjectPage({ params }: Params) {
                 href={`/admin/projects/${params.projectId}/purchase-orders`}
                 className="text-primary hover:underline"
               >
-                Gestionar órdenes de compra
+                Gestionar órdenes de venta
               </Link>
             </p>
           </CardContent>

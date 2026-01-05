@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('Error fetching purchase orders:', error)
       return NextResponse.json(
-        { error: error.message || 'Error al obtener órdenes de compra' },
+        { error: error.message || 'Error al obtener órdenes de venta' },
         { status: 500 }
       )
     }

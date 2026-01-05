@@ -141,7 +141,7 @@ export default async function ProjectsPage() {
                       className="flex items-center gap-1 text-sm text-primary hover:underline"
                     >
                       <ShoppingCart className="w-4 h-4" />
-                      Órdenes de Compra
+                      Órdenes de Venta
                     </Link>
                   </div>
                 </CardContent>
