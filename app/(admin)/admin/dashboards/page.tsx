@@ -17,7 +17,8 @@ import {
   Upload,
   Download,
   Settings,
-  Users
+  Users,
+  FolderOpen
 } from 'lucide-react'
 
 interface AdminWorkMetrics {
@@ -136,6 +137,12 @@ export default function DashboardsPage() {
   ]
 
   const quickActions = [
+    {
+      href: '/admin/projects',
+      title: 'Proyectos',
+      description: 'Ver y gestionar todos los proyectos',
+      icon: FolderOpen,
+    },
     {
       href: '/admin/users',
       title: 'Gestión de Usuarios',

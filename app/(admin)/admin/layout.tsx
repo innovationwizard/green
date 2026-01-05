@@ -45,6 +45,7 @@ export default async function AdminLayout({
           </div>
           <div className="flex gap-4 text-sm">
             <Link href="/admin/dashboards" className="hover:text-primary">Panel</Link>
+            <Link href="/admin/projects" className="hover:text-primary">Proyectos</Link>
             <Link href="/admin/users" className="hover:text-primary">Usuarios</Link>
             <Link href="/admin/projections" className="hover:text-primary">Proyecciones</Link>
             <Link href="/admin/quotes/import" className="hover:text-primary">Importar Cotización</Link>
