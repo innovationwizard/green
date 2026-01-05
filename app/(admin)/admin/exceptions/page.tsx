@@ -8,6 +8,7 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { AlertTriangle } from 'lucide-react'
 import { ExceptionEvent, OmissionWarning } from '@/types/dashboard.types'
+import { toTitleCase } from '@/lib/utils/text-format'
 
 export default function ExceptionsPage() {
   const [duplicates, setDuplicates] = useState<ExceptionEvent[]>([])
@@ -93,7 +94,7 @@ export default function ExceptionsPage() {
                       {event.event_type.replace(/_/g, ' ')}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Proyecto: {event.project?.human_id || 'N/A'}
+                      Proyecto: {event.project?.human_id ? toTitleCase(event.project.human_id) : 'N/A'}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       Creado por: {event.created_by_user?.full_name || event.created_by_user?.email || 'N/A'}

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { toTitleCase } from '@/lib/utils/text-format'
 import { exportData, ExportData } from './export-service'
 import { Database } from '@/types/database.types'
 import { format as formatDate } from 'date-fns'
@@ -56,7 +57,7 @@ export async function exportAuditLog(
       event.id,
       event.client_uuid,
       event.event_type,
-      project?.human_id || '',
+      project?.human_id ? toTitleCase(project.human_id) : '',
       user?.full_name || user?.email || '',
       formatDate(new Date(event.created_at), "yyyy-MM-dd HH:mm:ss"),
       event.device_id || '',

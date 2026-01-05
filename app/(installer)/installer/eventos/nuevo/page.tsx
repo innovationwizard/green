@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { getCachedProjects, CachedProject } from '@/lib/indexeddb/projects'
 import { searchItems, CachedItem } from '@/lib/indexeddb/items'
 import { EventType, MaterialSource, PaymentMethod, Database } from '@/types/database.types'
+import { toTitleCase } from '@/lib/utils/text-format'
 
 type ProjectRow = Database['public']['Tables']['projects']['Row']
 
@@ -174,7 +175,7 @@ export default function NuevoEventoPage() {
               <option value="">Selecciona un proyecto</option>
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.human_id} - {p.installation_address}
+                  {toTitleCase(p.human_id)} - {p.installation_address}
                 </option>
               ))}
             </select>

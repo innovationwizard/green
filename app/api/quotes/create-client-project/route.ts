@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/database.types'
+import { generateProjectHumanId } from '@/lib/utils/text-format'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 type ClientRow = Database['public']['Tables']['clients']['Row']
@@ -71,11 +72,8 @@ export async function POST(request: NextRequest) {
       clientId = newClient.id
     }
 
-    // Generate base project human_id from client name
-    const baseHumanId = client_name
-      .toUpperCase()
-      .replace(/[^A-Z0-9]/g, '')
-      .substring(0, 20) || 'PROY-' + Date.now().toString().slice(-6)
+    // Generate base project human_id from client name (title case)
+    const baseHumanId = generateProjectHumanId(client_name, 20)
 
     // Check if project with this human_id already exists
     let projectHumanId = baseHumanId

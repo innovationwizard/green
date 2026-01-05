@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { ArrowLeft, Building2, MapPin, Calendar, DollarSign, Zap, FileText, ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { toTitleCase } from '@/lib/utils/text-format'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 type ProjectRow = Database['public']['Tables']['projects']['Row']
@@ -102,7 +103,7 @@ export default async function ProjectPage({ params }: Params) {
             Volver
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold">Proyecto: {project.human_id}</h1>
+        <h1 className="text-3xl font-bold">Proyecto: {toTitleCase(project.human_id)}</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -117,7 +118,7 @@ export default async function ProjectPage({ params }: Params) {
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm font-medium text-muted-foreground">ID del Proyecto</label>
-              <p className="text-lg font-semibold">{project.human_id}</p>
+              <p className="text-lg font-semibold">{toTitleCase(project.human_id)}</p>
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">Cliente</label>

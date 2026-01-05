@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { parseCSVQuote, parseXLSXQuote, extractPDFQuote, ParsedQuote } from '@/lib/import/quote-parser'
+import { toTitleCase } from '@/lib/utils/text-format'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -178,7 +179,7 @@ export default function ImportQuotePage() {
             <option value="">Selecciona un proyecto</option>
             {projects.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.human_id} - {p.installation_address}
+                {toTitleCase(p.human_id)} - {p.installation_address}
               </option>
             ))}
           </select>
