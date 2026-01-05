@@ -118,25 +118,30 @@ function parsePDFText(text: string): ParsedPurchaseOrder {
       }
     }
     
-    // Extract vendor - look for "Para" on its own line, vendor name on next line
-    if (!vendor && upperLine === 'PARA' && i + 1 < lines.length) {
-      vendor = lines[i + 1].trim()
-      // Clean up common prefixes
-      if (vendor) {
-        vendor = vendor.replace(/^(PARA|VENDEDOR|PROVEEDOR|SEÑOR|SEÑORA|SR\.|SRA\.)\s*/i, '').trim()
+    // Extract vendor - the supplier Green is buying FROM (not the customer/client)
+    // Note: "Para" field is the customer/client, NOT the vendor
+    // Vendor field is historically unused and will be valuable for tracking suppliers
+    // Look for supplier/vendor indicators, but expect it to often be empty
+    if (!vendor) {
+      // Look for explicit vendor/supplier labels (not "Para" which is customer)
+      if ((upperLine.includes('PROVEEDOR') || upperLine.includes('SUPPLIER') || upperLine.includes('VENDEDOR')) &&
+          !upperLine.includes('PARA') && !upperLine.includes('CLIENTE')) {
+        const colonIndex = line.indexOf(':')
+        if (colonIndex > -1) {
+          vendor = line.substring(colonIndex + 1).trim()
+        } else if (i + 1 < lines.length) {
+          vendor = lines[i + 1].trim()
+        }
+        // Clean up common prefixes
+        if (vendor) {
+          vendor = vendor.replace(/^(PROVEEDOR|SUPPLIER|VENDEDOR|SEÑOR|SEÑORA|SR\.|SRA\.)\s*/i, '').trim()
+        }
       }
-    } else if (!vendor && (upperLine.includes('PARA') || upperLine.includes('VENDEDOR') || upperLine.includes('PROVEEDOR'))) {
-      const colonIndex = line.indexOf(':')
-      if (colonIndex > -1) {
-        vendor = line.substring(colonIndex + 1).trim()
-      } else if (i + 1 < lines.length && !lines[i + 1].toUpperCase().includes('FECHA')) {
-        vendor = lines[i + 1].trim()
-      }
-      // Clean up common prefixes
-      if (vendor) {
-        vendor = vendor.replace(/^(PARA|VENDEDOR|PROVEEDOR|SEÑOR|SEÑORA|SR\.|SRA\.)\s*/i, '').trim()
-      }
+      // Look for company name in header/footer that might be the supplier
+      // This is often in the first few lines or document metadata
+      // But be careful not to confuse with customer name
     }
+    // If vendor is not found, leave it undefined (expected behavior)
     
     // Extract issue date - look for "Fecha" on its own line, date on next line
     if (!issue_date) {
