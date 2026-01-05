@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/database.types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
-import { ArrowLeft, Building2, MapPin, Calendar, DollarSign, Zap, FileText } from 'lucide-react'
+import { ArrowLeft, Building2, MapPin, Calendar, DollarSign, Zap, FileText, ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 type UserRow = Database['public']['Tables']['users']['Row']
@@ -202,6 +202,33 @@ export default async function ProjectPage({ params }: Params) {
                 })}
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Purchase Orders */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="w-5 h-5" />
+                Órdenes de Compra
+              </div>
+              <Link href={`/admin/projects/${params.projectId}/purchase-orders`}>
+                <Button variant="outline" size="sm">
+                  Ver Todas
+                </Button>
+              </Link>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-center py-4">
+              <Link 
+                href={`/admin/projects/${params.projectId}/purchase-orders`}
+                className="text-primary hover:underline"
+              >
+                Gestionar órdenes de compra
+              </Link>
+            </p>
           </CardContent>
         </Card>
 

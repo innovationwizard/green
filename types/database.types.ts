@@ -156,6 +156,7 @@ export interface Database {
           id: string
           name: string
           sku: string | null
+          sap_article_number: string | null
           unit: string
           category: string | null
           default_unit_cost: number | null
@@ -168,6 +169,7 @@ export interface Database {
           id?: string
           name: string
           sku?: string | null
+          sap_article_number?: string | null
           unit: string
           category?: string | null
           default_unit_cost?: number | null
@@ -178,6 +180,7 @@ export interface Database {
           id?: string
           name?: string
           sku?: string | null
+          sap_article_number?: string | null
           unit?: string
           category?: string | null
           default_unit_cost?: number | null
@@ -311,6 +314,91 @@ export interface Database {
           system_size_kw?: number | null
           expected_duration_days?: number | null
           updated_at?: string
+        }
+      }
+      purchase_orders: {
+        Row: {
+          id: string
+          project_id: string | null
+          po_number: string
+          vendor: string | null
+          issue_date: string
+          delivery_date: string | null
+          salesperson_id: string | null
+          subtotal: number | null
+          tax: number | null
+          total: number
+          source: string
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          project_id?: string | null
+          po_number: string
+          vendor?: string | null
+          issue_date: string
+          delivery_date?: string | null
+          salesperson_id?: string | null
+          subtotal?: number | null
+          tax?: number | null
+          total: number
+          source?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          project_id?: string | null
+          po_number?: string
+          vendor?: string | null
+          issue_date?: string
+          delivery_date?: string | null
+          salesperson_id?: string | null
+          subtotal?: number | null
+          tax?: number | null
+          total?: number
+          source?: string
+          updated_at?: string
+        }
+      }
+      purchase_order_items: {
+        Row: {
+          id: string
+          purchase_order_id: string
+          line_number: number
+          article_number: string | null
+          item_id: string | null
+          description: string
+          unit: string
+          quantity: number
+          unit_price: number
+          line_total: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          purchase_order_id: string
+          line_number: number
+          article_number?: string | null
+          item_id?: string | null
+          description: string
+          unit: string
+          quantity: number
+          unit_price: number
+          line_total: number
+        }
+        Update: {
+          id?: string
+          purchase_order_id?: string
+          line_number?: number
+          article_number?: string | null
+          item_id?: string | null
+          description?: string
+          unit?: string
+          quantity?: number
+          unit_price?: number
+          line_total?: number
         }
       }
       cash_boxes: {
