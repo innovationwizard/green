@@ -38,7 +38,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch all items with SAP article numbers
-    const { data: items, error: itemsError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Supabase type inference doesn't recognize sap_article_number field yet
+    const { data: itemsData, error: itemsError } = await supabase
       .from('items')
       .select('id, name, sap_article_number, unit, default_unit_cost')
       .eq('active', true)
@@ -51,9 +53,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Type assertion for items with sap_article_number
+    type ItemWithSAP = {
+      id: string
+      name: string
+      sap_article_number: string | null
+      unit: string
+      default_unit_cost: number | null
+    }
+    const items = (itemsData || []) as ItemWithSAP[]
+
     // Match items by SAP article number first, then by description similarity
     const matches = body.line_items.map(lineItem => {
-      let matchedItem: (typeof items)[0] | null = null
+      let matchedItem: ItemWithSAP | null = null
       let matchMethod: 'sap_article' | 'description' | null = null
 
       if (!items || items.length === 0) {

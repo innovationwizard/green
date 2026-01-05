@@ -7,10 +7,9 @@ import { Database } from '@/types/database.types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ArrowLeft, Upload, Plus, CheckCircle2, XCircle, Search } from 'lucide-react'
+import { ArrowLeft, Plus, CheckCircle2, XCircle } from 'lucide-react'
 import { ParsedPurchaseOrder } from '@/app/api/purchase-orders/extract-pdf/route'
 
-type UserRow = Database['public']['Tables']['users']['Row']
 type SalespersonRow = Database['public']['Tables']['salespeople']['Row']
 
 interface PurchaseOrderWithItems {
@@ -149,7 +148,7 @@ export default function PurchaseOrdersPage() {
 
       if (result.success) {
         const matches: Record<number, string | null> = {}
-        result.matches.forEach((match: any, index: number) => {
+        result.matches.forEach((match: { matched_item: { id: string } | null }, index: number) => {
           if (match.matched_item) {
             matches[index] = match.matched_item.id
           }

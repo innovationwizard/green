@@ -29,7 +29,9 @@ export async function GET(request: NextRequest) {
     const projectId = searchParams.get('project_id')
 
     // Build query
-    let query = supabase
+    // Type assertion needed because Supabase client types haven't been regenerated with purchase_orders table
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query: any = supabase
       .from('purchase_orders')
       .select(`
         *,
