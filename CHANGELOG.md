@@ -20,6 +20,8 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 
 **Razón del cambio**: El sistema maneja órdenes de venta (lo que Green vende a clientes), no órdenes de compra (lo que Green compra a proveedores). La terminología ahora refleja correctamente el propósito del sistema.
 
+**Migración aplicada exitosamente**: ✅ (Enero 2025)
+
 ### Agregado
 
 #### Sistema de Órdenes de Venta (Sales Orders) - Mejoras de Extracción PDF
