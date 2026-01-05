@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'GREENTELLIGENCE'
+export const alt = 'Greentelligence'
 export const size = {
   width: 1200,
   height: 630,
@@ -58,7 +58,7 @@ export default async function Image() {
             marginBottom: '20px',
           }}
         >
-          GREENTELLIGENCE
+          Greentelligence
         </div>
         <div
           style={{

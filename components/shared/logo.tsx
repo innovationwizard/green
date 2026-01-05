@@ -1,5 +1,6 @@
 import { FileChartColumnIncreasing } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
+import { toTitleCase } from '@/lib/utils/text-format'
 
 interface LogoProps {
   className?: string
@@ -16,7 +17,7 @@ export function Logo({ className, size = 24, showText = true }: LogoProps) {
         strokeWidth={2}
       />
       {showText && (
-        <span className="font-semibold text-lg">GREENTELLIGENCE</span>
+        <span className="font-semibold text-lg">{toTitleCase('GREENTELLIGENCE')}</span>
       )}
     </div>
   )

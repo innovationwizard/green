@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ServiceWorkerHandler } from '@/components/shared/service-worker-handler'
+import { toTitleCase } from '@/lib/utils/text-format'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -44,9 +45,11 @@ function getBaseUrl() {
 const baseUrl = getBaseUrl()
 const ogImageUrl = `${baseUrl}/opengraph-image`
 
+const appTitle = toTitleCase('GREENTELLIGENCE')
+
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
-  title: 'GREENTELLIGENCE',
+  title: appTitle,
   description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
   manifest: '/manifest.json',
   icons: {
@@ -62,31 +65,31 @@ export const metadata: Metadata = {
     // Additional sizes can be added here if needed for specific browser support
   },
   openGraph: {
-    title: 'GREENTELLIGENCE',
+    title: appTitle,
     description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
     type: 'website',
     url: baseUrl,
-    siteName: 'GREENTELLIGENCE',
+    siteName: appTitle,
     images: [
       {
         url: ogImageUrl,
         width: 1200,
         height: 630,
-        alt: 'GREENTELLIGENCE',
+        alt: appTitle,
         type: 'image/png',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'GREENTELLIGENCE',
+    title: appTitle,
     description: 'Optimización y Automatización de Procesos con Inteligencia Artificial',
     images: [ogImageUrl],
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'GREENTELLIGENCE',
+    title: appTitle,
   },
 }
 
