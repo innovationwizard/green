@@ -6,6 +6,32 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 
 ### Agregado
 
+#### Sistema de Órdenes de Compra (Purchase Orders) - Mejoras de Extracción PDF
+
+- **Mejoras en Extracción de PDF de Órdenes de Compra**:
+  - Extracción mejorada del número de orden (PO number) - detecta patrones como "Pedido de cliente 2657"
+  - Extracción mejorada de fechas (emisión y entrega) - maneja formato DD/MM/YYYY de Guatemala
+  - Extracción mejorada de totales - maneja prefijos de moneda "QTZ" y "Q"
+  - Extracción mejorada de vendedor/salesperson - detecta "Empleado del departamento de ventas"
+  - Parsing mejorado de tabla de items - detecta correctamente columnas: #, Número de artículo, Descripción, Unidad, Cantidad, Precio, Total
+  - Manejo robusto de prefijos de moneda en precios y totales
+  - Validación mejorada de items extraídos (filtra headers, totales, etc.)
+  - Soporte para múltiples formatos de tabla y fallback parsing
+
+- **Corrección en Extracción de Vendor**:
+  - Corregido: El campo "Para" ahora se reconoce correctamente como cliente/customer, NO como vendor
+  - Vendor (proveedor) solo se extrae cuando hay etiquetas explícitas (Proveedor, Supplier, Vendedor)
+  - Vendor field históricamente no usado y será valioso para tracking de proveedores
+  - Se espera que vendor esté vacío/undefined en muchos casos (comportamiento esperado)
+
+- **Manejo de Campos Requeridos Faltantes**:
+  - UI mejorada para manejar campos requeridos faltantes (po_number, issue_date, total)
+  - Campos editables aparecen cuando faltan datos del PDF
+  - Validación client-side antes de importar
+  - Fecha de emisión por defecto a fecha actual si falta
+
+### Cambiado
+
 #### Landing Pages por Rol (Mejores Prácticas de la Industria)
 
 - **DEV Landing Page** (`/dev`):
