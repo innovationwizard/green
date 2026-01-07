@@ -182,15 +182,15 @@ export default function SalesOrdersPage() {
   }
 
   async function handleImport() {
-    if (!parsedPO) {
+    if (!parsedSO) {
       setError('Procesa un archivo primero')
       return
     }
 
     // Validate required fields - use editable values if available, otherwise use parsed values
-    const finalPONumber = editablePO?.po_number || parsedPO.po_number
-    const finalIssueDate = editablePO?.issue_date || parsedPO.issue_date
-    const finalTotal = editablePO?.total || parsedPO.total
+    const finalPONumber = editablePO?.po_number || parsedSO.po_number
+    const finalIssueDate = editablePO?.issue_date || parsedSO.issue_date
+    const finalTotal = editablePO?.total || parsedSO.total
 
     if (!finalPONumber || !finalIssueDate || !finalTotal || finalTotal === 0) {
       setError('Por favor completa los campos requeridos: Número de PO, Fecha de Emisión, y Total')
@@ -211,10 +211,10 @@ export default function SalesOrdersPage() {
 
       // Find salesperson by name if provided
       let salespersonId: string | undefined
-      if (parsedPO.salesperson_name) {
+      if (parsedSO.salesperson_name) {
         const salesperson = salespeople.find(
-          sp => sp.name.toLowerCase().includes(parsedPO.salesperson_name!.toLowerCase()) ||
-                parsedPO.salesperson_name!.toLowerCase().includes(sp.name.toLowerCase())
+          sp => sp.name.toLowerCase().includes(parsedSO.salesperson_name!.toLowerCase()) ||
+                parsedSO.salesperson_name!.toLowerCase().includes(sp.name.toLowerCase())
         )
         if (salesperson) {
           salespersonId = salesperson.id
